@@ -49,23 +49,7 @@ namespace PhaseOne.Controllers
             return View(await courses.ToListAsync());
         }
 
-        // =======================
-        // GET: Courses/Details/5
-        // =======================
-        //public async Task<IActionResult> Details(int? id)
-        //{
-        //    if (id == null) return NotFound();
-
-        //    var course = await _context.Courses
-        //        .Include(c => c.FirstTeacher)
-        //        .Include(c => c.SecondTeacher)
-        //        .FirstOrDefaultAsync(m => m.Id == id);
-
-        //    if (course == null) return NotFound();
-
-        //    return View(course);
-        //}
-
+        
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -245,84 +229,6 @@ namespace PhaseOne.Controllers
             _context.SaveChanges();
             return RedirectToAction("Details", new { id = courseId });
         }
-
-
-
-        //public async Task<IActionResult> ManageEnrollments(int courseid)
-        //{
-        //    var course = await _context.Courses
-        //        .Include(c => c.Enrollments)
-        //            .ThenInclude(e => e.Student)
-        //        .FirstOrDefaultAsync(c => c.Id == id);
-
-        //    if (course == null)
-        //        return NotFound();
-
-        //    var allStudents = await _context.Students.ToListAsync();
-
-        //    var viewModel = new CourseEnrollmentViewModel
-        //    {
-        //        CourseId = course.Id,
-        //        CourseTitle = course.Title,
-        //        Enrollments = course.Enrollments.Select(e => new EnrollmentEditModel
-        //        {
-        //            EnrollmentId = e.Id,
-        //            StudentId = e.StudentId,
-        //            StudentName = e.Student.FirstName + " " + e.Student.LastName,
-        //            Grade = e.Grade,
-        //            ExamPoints = e.ExamPoints,
-        //            SeminalPoints = e.SeminalPoints,
-        //            ProjectPoints = e.ProjectPoints,
-        //            AdditionalPoints = e.AdditionalPoints,
-        //            SeminalUrl = e.SeminalUrl,
-        //            ProjectUrl = e.ProjectUrl,
-        //            FinishDate = e.FinishDate
-        //        }).ToList(),
-        //        AvailableStudents = allStudents
-        //            .Where(s => !course.Enrollments.Any(e => e.StudentId == s.Id))
-        //            .Select(s => new SelectListItem
-        //            {
-        //                Value = s.Id.ToString(),
-        //                Text = s.FirstName + " " + s.LastName
-        //            }).ToList()
-        //    };
-
-        //    return View(viewModel);
-        //}
-
-        // =======================
-        // POST: PRIKAZ NA ZAPISANI STUDENTI
-        // =======================
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> ManageEnrollments(CourseEnrollmentViewModel model)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        foreach (var e in model.Enrollments)
-        //        {
-        //            var enrollment = await _context.Enrollments.FindAsync(e.EnrollmentId);
-        //            if (enrollment != null)
-        //            {
-        //                enrollment.Grade = e.Grade;
-        //                enrollment.ExamPoints = e.ExamPoints;
-        //                enrollment.SeminalPoints = e.SeminalPoints;
-        //                enrollment.ProjectPoints = e.ProjectPoints;
-        //                enrollment.AdditionalPoints = e.AdditionalPoints;
-        //                enrollment.SeminalUrl = e.SeminalUrl;
-        //                enrollment.ProjectUrl = e.ProjectUrl;
-        //                enrollment.FinishDate = e.FinishDate;
-        //            }
-        //        }
-
-        //        await _context.SaveChangesAsync();
-        //        return RedirectToAction(nameof(Edit), new { id = model.CourseId });
-        //    }
-
-        //    return View(model);
-        //}
-
 
         // =======================
         // HELPERS
