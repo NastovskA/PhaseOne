@@ -1,0 +1,32 @@
+﻿@model IEnumerable<PhaseOne.Models.SeminarWork>
+
+<h2>Seminar Works</h2>
+
+<!-- Копче за Create -->
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Seminar Work</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Student</th>
+            <th>Course</th>
+            <th>File</th>
+            <th>Upload Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Student?.FirstName @item.Student?.LastName</td>
+                <td>@item.Course?.Title</td>
+                <td>
+                    <a href="@item.FilePath" target="_blank">View File</a>
+                </td>
+                <td>@item.UploadDate</td>
+            </tr>
+        }
+    </tbody>
+</table>

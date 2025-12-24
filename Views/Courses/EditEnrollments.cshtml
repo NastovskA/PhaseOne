@@ -1,0 +1,20 @@
+﻿@model CourseEnrollmentViewModel
+
+<form asp-action="UpdateEnrollments">
+    <input type="hidden" name="CourseId" value="@Model.CourseId" />
+    <table class="table">
+        <thead><tr><th>Студент</th><th>Запишан</th></tr></thead>
+        <tbody>
+            @foreach (var student in Model.Students)
+            {
+                <tr>
+                    <td>@student.FullName</td>
+                    <td>
+                        <input type="checkbox" name="SelectedStudentIds" value="@student.StudentId" @(student.IsEnrolled ? "checked" : "") />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Зачувај</button>
+</form>
