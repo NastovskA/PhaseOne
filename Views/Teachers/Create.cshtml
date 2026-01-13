@@ -1,58 +1,540 @@
 ﻿@model Teacher
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Нов професор";
 }
 
-<h1>Create</h1>
+<style>
+    .create-container {
+        max-width: 1000px;
+        margin: 20px auto;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
 
-<h4>Teacher</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
+    .create-header {
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        color: white;
+        padding: 25px 30px;
+        margin-bottom: 0;
+    }
+
+    .create-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .create-subtitle {
+        color: #e0c8ef;
+        font-size: 1rem;
+        margin-top: 5px;
+        font-weight: 400;
+    }
+
+    .form-wrapper {
+        padding: 30px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .form-section {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 25px;
+        border: 1px solid #e9ecef;
+        border-left: 4px solid #9b59b6;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .form-section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(155, 89, 182, 0.1);
+        }
+
+    .section-title {
+        color: #8e44ad;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #9b59b6;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 22px;
+        position: relative;
+    }
+
+        .form-group label {
+            display: block;
+            color: #495057;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+    .required-label::after {
+        content: "*";
+        color: #e74c3c;
+        margin-left: 4px;
+        font-size: 1.1rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        background-color: #fff;
+    }
+
+        .form-control:focus {
+            border-color: #9b59b6;
+            box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.1);
+            outline: none;
+        }
+
+        .form-control.required-field {
+            border-left: 4px solid #9b59b6;
+            background-color: #fcfaff;
+        }
+
+    .field-info {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding-left: 5px;
+    }
+
+    .text-danger {
+        color: #e74c3c;
+        font-size: 0.85rem;
+        margin-top: 6px;
+        display: block;
+        padding-left: 5px;
+        font-weight: 500;
+    }
+
+    .validation-summary {
+        background-color: #ffeaa7;
+        border-left: 4px solid #f1c40f;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 25px;
+    }
+
+        .validation-summary ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+    .action-buttons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 25px;
+        border-top: 2px solid #f0f0f0;
+        gap: 15px;
+    }
+
+    .btn {
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #8e44ad, #7d3c98);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(142, 68, 173, 0.2);
+            color: white;
+            text-decoration: none;
+        }
+
+    .btn-secondary {
+        background-color: #95a5a6;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(149, 165, 166, 0.2);
+            color: white;
+            text-decoration: none;
+        }
+
+    .back-link {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+        .back-link a {
+            color: #9b59b6;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+            .back-link a:hover {
+                background-color: #f8f9fa;
+                color: #7d3c98;
+                text-decoration: none;
+            }
+
+    .help-tips {
+        background-color: #f9f0ff;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 30px;
+        border-left: 4px solid #9b59b6;
+    }
+
+    .help-title {
+        color: #8e44ad;
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .help-list {
+        margin: 0;
+        padding-left: 20px;
+        color: #555;
+        font-size: 0.9rem;
+    }
+
+        .help-list li {
+            margin-bottom: 8px;
+        }
+
+    .icon {
+        display: inline-block;
+        width: 20px;
+        text-align: center;
+    }
+
+    .rank-examples {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .rank-example {
+        background-color: #e8f6f3;
+        color: #27ae60;
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .rank-example:hover {
+            background-color: #d5f4e6;
+            transform: translateY(-1px);
+        }
+
+    .degree-examples {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .degree-example {
+        background-color: #e8f4fd;
+        color: #3498db;
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .degree-example:hover {
+            background-color: #d6eaf8;
+            transform: translateY(-1px);
+        }
+
+    @@media (max-width: 768px) {
+        .create-container {
+            margin: 10px;
+            border-radius: 8px;
+        }
+
+        .form-wrapper {
+            padding: 20px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+
+        .help-tips {
+            margin-top: 20px;
+        }
+    }
+
+    .form-group.focused label {
+        color: #9b59b6;
+        font-weight: 600;
+    }
+</style>
+
+<div class="create-container">
+    <div class="create-header">
+        <h1 class="create-title">
+            <span class="icon">👨‍🏫</span>
+            Нов професор
+        </h1>
+        <div class="create-subtitle">
+            Внесете ги информациите за новиот професор
+        </div>
+    </div>
+
+    <div class="form-wrapper">
+        <div asp-validation-summary="All" class="validation-summary"></div>
+
+        <form asp-action="Create" method="post">
+            <div class="form-grid">
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="icon">👤</span>
+                        Основни информации
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="FirstName" class="required-label"></label>
+                        <input asp-for="FirstName" class="form-control required-field"
+                               placeholder="Внесете име (на пр. Петар)" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="LastName" class="required-label"></label>
+                        <input asp-for="LastName" class="form-control required-field"
+                               placeholder="Внесете презиме (на пр. Петровски)" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="HireDate" class="required-label"></label>
+                        <input asp-for="HireDate" class="form-control required-field"
+                               type="date" />
+                        <span asp-validation-for="HireDate" class="text-danger"></span>
+                        <div class="field-info">
+                            <span class="icon">📅</span>
+                            Датум на вработување на професорот
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="icon">🎓</span>
+                        Академски податоци
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Degree" class="required-label"></label>
+                        <input asp-for="Degree" class="form-control required-field"
+                               placeholder="На пр. Доктор на науки, Магистер..." />
+                        <span asp-validation-for="Degree" class="text-danger"></span>
+                        <div class="field-info">
+                            <span class="icon">🎓</span>
+                            Академски степен на професорот
+                        </div>
+                        <div class="degree-examples">
+                            <div class="degree-example" onclick="document.getElementById('Degree').value='Доктор на науки'">Доктор на науки</div>
+                            <div class="degree-example" onclick="document.getElementById('Degree').value='Магистер'">Магистер</div>
+                            <div class="degree-example" onclick="document.getElementById('Degree').value='Дипломиран инженер'">Дипломиран инженер</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="AcademicRank" class="required-label"></label>
+                        <input asp-for="AcademicRank" class="form-control required-field"
+                               placeholder="На пр. Редовен професор, Вонреден професор..." />
+                        <span asp-validation-for="AcademicRank" class="text-danger"></span>
+                        <div class="field-info">
+                            <span class="icon">⭐</span>
+                            Академски ранг на професорот
+                        </div>
+                        <div class="rank-examples">
+                            <div class="rank-example" onclick="document.getElementById('AcademicRank').value='Редовен професор'">Редовен професор</div>
+                            <div class="rank-example" onclick="document.getElementById('AcademicRank').value='Вонреден професор'">Вонреден професор</div>
+                            <div class="rank-example" onclick="document.getElementById('AcademicRank').value='Доцент'">Доцент</div>
+                            <div class="rank-example" onclick="document.getElementById('AcademicRank').value='Асистент'">Асистент</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="OfficeNumber"></label>
+                        <input asp-for="OfficeNumber" class="form-control"
+                               placeholder="На пр. 201, 302, А-12..." />
+                        <span asp-validation-for="OfficeNumber" class="text-danger"></span>
+                        <div class="field-info">
+                            <span class="icon">🏢</span>
+                            Број на канцеларија (опционално)
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label asp-for="Email" class="control-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label asp-for="Password" class="required-label"></label>
+                        <input asp-for="Password" class="form-control required-field" type="password"
+                               placeholder="Внесете привремена лозинка" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                        <div class="field-info">
+                            <span class="icon">🔒</span>
+                            Лозинката ќе се зачува хаширана во системот (Identity)
+                        </div>
+                    </div>
+
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="LastName" class="control-label"></label>
-                <input asp-for="LastName" class="form-control" />
-                <span asp-validation-for="LastName" class="text-danger"></span>
+
+            <div class="help-tips">
+                <div class="help-title">
+                    <span class="icon">💡</span>
+                    Корисни совети за пополнување:
+                </div>
+                <ul class="help-list">
+                    <li>Полињата означени со <strong>*</strong> се задолжителни</li>
+                    <li>Кликнете на примерите за брзо пополнување на степен и ранг</li>
+                    <li>Датумот на вработување може да биде и иден датум</li>
+                    <li>Бројот на канцеларија не е задолжителен</li>
+                    <li>Сите податоци може да се ажурираат подоцна</li>
+                </ul>
             </div>
-            <div class="form-group">
-                <label asp-for="Degree" class="control-label"></label>
-                <input asp-for="Degree" class="form-control" />
-                <span asp-validation-for="Degree" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="AcademicRank" class="control-label"></label>
-                <input asp-for="AcademicRank" class="form-control" />
-                <span asp-validation-for="AcademicRank" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="OfficeNumber" class="control-label"></label>
-                <input asp-for="OfficeNumber" class="form-control" />
-                <span asp-validation-for="OfficeNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="HireDate" class="control-label"></label>
-                <input asp-for="HireDate" class="form-control" />
-                <span asp-validation-for="HireDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+
+            <div class="action-buttons">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <span class="icon">←</span>
+                    Откажи и врати се назад
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <span class="icon">💾</span>
+                    Зачувај нов професор
+                </button>
             </div>
         </form>
+
+        <div class="back-link">
+            <a asp-action="Index">
+                <span class="icon">↶</span>
+                Назад кон листата на професори
+            </a>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // Mark required fields
+            $('input[data-val-required]').addClass('required-field');
+
+            // Add focus effects
+            $('.form-control').focus(function() {
+                $(this).closest('.form-group').addClass('focused');
+            }).blur(function() {
+                $(this).closest('.form-group').removeClass('focused');
+            });
+
+            // Set today as default date for hire date if empty
+            if (!$('#HireDate').val()) {
+                var today = new Date().toISOString().split('T')[0];
+                $('#HireDate').val(today);
+            }
+
+            // Format date display
+            $('#HireDate').on('change', function() {
+                var selectedDate = new Date($(this).val());
+                var formattedDate = selectedDate.toLocaleDateString('mk-MK');
+                $(this).next('.field-info').html('<span class="icon">📅</span> Избран датум: ' + formattedDate);
+            });
+
+            // Add click handlers for example buttons
+            $('.rank-example, .degree-example').click(function() {
+                $(this).css({
+                    'background-color': '#9b59b6',
+                    'color': 'white'
+                });
+                setTimeout(() => {
+                    $(this).css({
+                        'background-color': '',
+                        'color': ''
+                    });
+                }, 300);
+            });
+        });
+    </script>
 }

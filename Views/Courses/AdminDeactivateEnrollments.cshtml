@@ -1,0 +1,448 @@
+﻿@model PhaseOne.Models.AdminDeactivateEnrollmentsViewModel
+
+@{
+    ViewData["Title"] = "Деактивирај студенти";
+}
+
+<div class="deactivation-container">
+    <h2 class="page-title">
+        <i class="fas fa-user-slash me-2"></i>
+        Деактивирање на студенти – @ViewBag.CourseTitle
+    </h2>
+
+    <div class="info-card mb-4">
+        <div class="info-content">
+            <h5 class="info-title">Инструкции</h5>
+            <p class="info-text">
+                1. Филтрирај запишувања по година и семестар<br>
+                2. Избери студенти за деактивирање<br>
+                3. Постави датум на завршување<br>
+                4. Потврди деактивирање
+            </p>
+        </div>
+    </div>
+
+    <!-- Филтер -->
+    <div class="filter-card card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-filter me-2"></i>
+                Филтрирај запишувања
+            </h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="AdminDeactivateEnrollments" method="get" class="filter-form">
+                <input type="hidden" name="courseId" value="@Model.CourseId" />
+
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold">
+                            Година
+                        </label>
+                        <input type="number"
+                               name="year"
+                               value="@Model.Year"
+                               class="form-control"
+                               min="2000"
+                               placeholder="2024" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">
+                            Семестар
+                        </label>
+                        <select name="semester" class="form-select">
+                            <option value="Winter" selected="@(Model.Semester == "Winter")">
+                                Зимски семестар
+                            </option>
+                            <option value="Summer" selected="@(Model.Semester == "Summer")">
+                                Летен семестар
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary w-100 filter-btn">
+                            <i class="fas fa-search me-2"></i>
+                            Вчитај запишувања
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.Year > 0 && !string.IsNullOrEmpty(Model.Semester))
+    {
+        <div class="current-selection mb-4">
+            <div class="badge-section">
+                <span class="selection-badge year-badge">
+                    <i class="fas fa-calendar me-1"></i>
+                    @Model.Year
+                </span>
+                <span class="selection-badge semester-badge">
+                    <i class="fas fa-graduation-cap me-1"></i>
+                    @Model.Semester семестар
+                </span>
+                <span class="selection-badge count-badge">
+                    <i class="fas fa-users me-1"></i>
+                    @(Model.Enrollments?.Count ?? 0) активни студенти
+                </span>
+            </div>
+        </div>
+    }
+
+    <!-- Форма за деактивирање -->
+    <div class="deactivation-card card shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Панел за деактивирање
+            </h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="AdminDeactivateEnrollments" method="post" id="deactivateForm">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="CourseId" />
+                <input type="hidden" asp-for="Year" />
+                <input type="hidden" asp-for="Semester" />
+
+                <!-- Датум на завршување -->
+                <div class="date-picker-container mb-4">
+                    <label asp-for="FinishDate" class="form-label fw-bold">
+                        Датум на завршување
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-clock"></i>
+                        </span>
+                        <input asp-for="FinishDate"
+                               type="date"
+                               class="form-control date-input"
+                               required />
+                    </div>
+                    <div class="date-hint">
+                        <small class="text-muted">
+                            Овој датум ќе биде поставен како датум на завршување за избраните запишувања
+                        </small>
+                    </div>
+                    <span asp-validation-for="FinishDate" class="validation-error"></span>
+                </div>
+
+                <!-- Листа на запишувања -->
+                <div class="enrollments-section">
+                    <div class="section-header mb-3">
+                        <h5>
+                            <i class="fas fa-list-check me-2"></i>
+                            Активни запишувања
+                        </h5>
+                        @if (Model.Enrollments != null && Model.Enrollments.Count > 0)
+                        {
+                            <div class="selection-controls">
+                                <button type="button" class="btn btn-sm btn-outline-primary" id="selectAll">
+                                    Избери ги сите
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAll">
+                                    Откажи се
+                                </button>
+                            </div>
+                        }
+                    </div>
+
+                    @if (Model.Enrollments == null || Model.Enrollments.Count == 0)
+                    {
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <h5>Нема активни запишувања</h5>
+                            <p class="text-muted">
+                                Не се пронајдени активни студенти за избраната година и семестар.
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="enrollments-list">
+                            <div class="row g-3">
+                                @foreach (var e in Model.Enrollments)
+                                {
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="enrollment-item card">
+                                            <div class="card-body">
+                                                <div class="form-check">
+                                                    <input class="form-check-input enrollment-checkbox"
+                                                           type="checkbox"
+                                                           name="SelectedEnrollmentIds"
+                                                           value="@e.EnrollmentId"
+                                                           id="enr_@e.EnrollmentId" />
+                                                    <label class="form-check-label" for="enr_@e.EnrollmentId">
+                                                        <div class="student-info">
+                                                            <div class="student-name">
+                                                                <i class="fas fa-user-graduate me-2"></i>
+                                                                @e.StudentDisplay
+                                                            </div>
+                                                            <div class="enrollment-meta">
+                                                                <small class="text-muted">
+                                                                    ID: @e.EnrollmentId
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="selection-summary mt-4 p-3 bg-light rounded">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <span class="selected-count">0</span> студенти избрани
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="submit"
+                                                class="btn btn-danger deactivate-btn"
+                                                disabled>
+                                            <i class="fas fa-user-slash me-2"></i>
+                                            Деактивирај избрани
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .deactivation-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 15px;
+    }
+
+    .page-title {
+        color: #2c3e50;
+        border-bottom: 2px solid #e74c3c;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    .info-card {
+        background: #f8f9fa;
+        border-left: 3px solid #3498db;
+        border-radius: 5px;
+        padding: 15px;
+    }
+
+    .info-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .info-text {
+        color: #34495e;
+        margin: 0;
+    }
+
+    .filter-card {
+        border: 1px solid #dee2e6;
+    }
+
+    .filter-btn {
+        border-radius: 5px;
+    }
+
+    .current-selection {
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 5px;
+        border-left: 3px solid #27ae60;
+    }
+
+    .badge-section {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .selection-badge {
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .year-badge {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+
+    .semester-badge {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+
+    .count-badge {
+        background: #e8f5e8;
+        color: #2e7d32;
+    }
+
+    .date-picker-container {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        border: 1px solid #dee2e6;
+    }
+
+    .date-hint {
+        margin-top: 5px;
+        font-size: 0.9em;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .selection-controls {
+        display: flex;
+        gap: 5px;
+    }
+
+    .enrollment-item {
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        transition: transform 0.2s;
+        height: 100%;
+    }
+
+        .enrollment-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+    .student-name {
+        font-weight: 500;
+        color: #2c3e50;
+        margin-bottom: 3px;
+    }
+
+    .enrollment-meta {
+        font-size: 0.85em;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 30px 15px;
+        background: #f8f9fa;
+        border-radius: 5px;
+        border: 1px dashed #dee2e6;
+    }
+
+    .empty-icon {
+        font-size: 40px;
+        color: #95a5a6;
+        margin-bottom: 10px;
+    }
+
+    .selection-summary {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+    }
+
+    .selected-count {
+        font-weight: 700;
+        color: #e74c3c;
+    }
+
+    .deactivate-btn {
+        border-radius: 5px;
+    }
+
+        .deactivate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+    .validation-error {
+        color: #e74c3c;
+        font-size: 0.85em;
+        margin-top: 5px;
+        display: block;
+    }
+
+    @@media (max-width: 768px) {
+        .deactivation-container {
+            padding: 10px;
+        }
+
+        .section-header {
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .selection-controls {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('.enrollment-checkbox');
+        const selectAllBtn = document.getElementById('selectAll');
+        const deselectAllBtn = document.getElementById('deselectAll');
+        const deactivateBtn = document.querySelector('.deactivate-btn');
+        const selectedCount = document.querySelector('.selected-count');
+        const deactivateForm = document.getElementById('deactivateForm');
+
+        function updateSelectedCount() {
+            const selected = document.querySelectorAll('.enrollment-checkbox:checked').length;
+            selectedCount.textContent = selected;
+            deactivateBtn.disabled = selected === 0;
+        }
+
+        selectAllBtn?.addEventListener('click', function() {
+            checkboxes.forEach(checkbox => checkbox.checked = true);
+            updateSelectedCount();
+        });
+
+        deselectAllBtn?.addEventListener('click', function() {
+            checkboxes.forEach(checkbox => checkbox.checked = false);
+            updateSelectedCount();
+        });
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateSelectedCount);
+        });
+
+        deactivateForm?.addEventListener('submit', function(e) {
+            const selectedCount = document.querySelectorAll('.enrollment-checkbox:checked').length;
+
+            if (selectedCount === 0) {
+                e.preventDefault();
+                alert('Ве молиме изберете барем еден студент за деактивирање.');
+                return;
+            }
+
+            if (!confirm(`Дали сте сигурни дека сакате да деактивирате ${selectedCount} студент(и)? Оваа акција не може да се врати.`)) {
+                e.preventDefault();
+            }
+        });
+
+        updateSelectedCount();
+    });
+</script>

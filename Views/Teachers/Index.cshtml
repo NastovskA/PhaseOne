@@ -1,90 +1,733 @@
 ﻿@model IEnumerable<Teacher>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Наставници";
 }
 
-<h1>Index</h1>
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-light: #e0e7ff;
+            --secondary-color: #3a0ca3;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #f8f9fa;
+            --dark-color: #2c3e50;
+            --gray-color: #6c757d;
+            --border-color: #dee2e6;
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
 
-<form asp-action="Index" method="get" class="border p-3 bg-light mb-4">
-    <div class="row">
-        <div class="col-md-3">
-            <label class="control-label">Име</label>
-            <input type="text" name="firstName" class="form-control" value="@Context.Request.Query["firstName"]" />
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+            background-color: #f8f9fa;
+            color: var(--dark-color);
+            padding: 15px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .page-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .page-title i {
+                color: var(--primary-color);
+            }
+
+        /* Cards */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-3px);
+                box-shadow: var(--hover-shadow);
+            }
+
+        .stat-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .stat-teachers {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+        }
+
+        .stat-content h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .stat-content p {
+            color: var(--gray-color);
+            font-size: 13px;
+        }
+
+        /* Create Button */
+        .create-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 16px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(67, 97, 238, 0.2);
+        }
+
+            .create-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+            }
+
+        /* Filter Section */
+        .filter-section {
+            background: white;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .filter-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--dark-color);
+        }
+
+        .filter-input {
+            padding: 9px 12px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 13px;
+            transition: border-color 0.2s;
+        }
+
+            .filter-input:focus {
+                outline: none;
+                border-color: var(--primary-color);
+            }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .search-btn {
+            padding: 9px 18px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .search-btn:hover {
+                background-color: var(--secondary-color);
+            }
+
+        .reset-btn {
+            padding: 9px 16px;
+            background-color: #f1f3f9;
+            color: var(--gray-color);
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+            .reset-btn:hover {
+                background-color: #e4e8f0;
+            }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .teachers-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+            .teachers-table thead {
+                background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            }
+
+            .teachers-table th {
+                padding: 14px 12px;
+                text-align: left;
+                color: white;
+                font-weight: 600;
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+            }
+
+            .teachers-table tbody tr {
+                border-bottom: 1px solid var(--border-color);
+                transition: background-color 0.15s;
+            }
+
+                .teachers-table tbody tr:hover {
+                    background-color: var(--primary-light);
+                }
+
+            .teachers-table td {
+                padding: 12px;
+                font-size: 13px;
+                color: var(--dark-color);
+            }
+
+        /* Avatar for teachers */
+        .teacher-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        .teacher-name-cell {
+            display: flex;
+            align-items: center;
+        }
+
+        .teacher-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .teacher-name {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        /* Status badges */
+        .badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .badge-active {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+
+        .badge-new {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: #2980b9;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+
+            .action-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            }
+
+        .action-edit {
+            background-color: var(--primary-color);
+        }
+
+        .action-details {
+            background-color: var(--success-color);
+        }
+
+        .action-delete {
+            background-color: var(--danger-color);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-color);
+        }
+
+            .empty-state i {
+                font-size: 48px;
+                margin-bottom: 15px;
+                color: #e4e8f0;
+            }
+
+            .empty-state h3 {
+                font-size: 18px;
+                margin-bottom: 8px;
+                color: var(--dark-color);
+            }
+
+            .empty-state p {
+                font-size: 13px;
+            }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .page-title {
+                font-size: 20px;
+            }
+
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .filter-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .filter-actions {
+                flex-direction: row;
+                justify-content: flex-start;
+            }
+
+            .teachers-table {
+                min-width: 600px;
+            }
+
+                .teachers-table th,
+                .teachers-table td {
+                    padding: 10px 8px;
+                    font-size: 12px;
+                }
+
+            .action-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .action-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .create-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 10px;
+            }
+
+            .teacher-name-cell {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .teacher-avatar {
+                margin-bottom: 5px;
+                margin-right: 0;
+            }
+        }
+
+        /* Tooltip for action buttons */
+        [title] {
+            position: relative;
+        }
+
+            [title]:hover::after {
+                content: attr(title);
+                position: absolute;
+                bottom: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: var(--dark-color);
+                color: white;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                white-space: nowrap;
+                z-index: 1000;
+                margin-bottom: 5px;
+            }
+
+            [title]:hover::before {
+                content: '';
+                position: absolute;
+                bottom: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                border-width: 5px;
+                border-style: solid;
+                border-color: var(--dark-color) transparent transparent transparent;
+                z-index: 1000;
+                margin-bottom: -5px;
+            }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title"><i class="fas fa-chalkboard-teacher"></i> Наставници</h1>
+                <p style="color: var(--gray-color); margin-top: 3px; font-size: 13px;">Управувајте со податоците за наставниот кадар</p>
+            </div>
+            <a asp-action="Create" class="create-btn">
+                <i class="fas fa-plus-circle"></i> Додади наставник
+            </a>
         </div>
-        <div class="col-md-3">
-            <label class="control-label">Презиме</label>
-            <input type="text" name="lastName" class="form-control" value="@Context.Request.Query["lastName"]" />
+
+        <!-- Statistics Cards -->
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-icon stat-teachers">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>@Model.Count()</h3>
+                    <p>Вкупно наставници</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background-color: rgba(46, 204, 113, 0.1); color: #27ae60;">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>@Model.Count(t => t.Degree != null && t.Degree.Contains("Доктор на науки"))</h3>
+                    <p>Доктори на науки</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background-color: rgba(243, 156, 18, 0.1); color: #f39c12;">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="stat-content">  
+                    <h3>@DateTime.Now.Year</h3>
+                    <p>Академска година</p>
+                </div>
+            </div>
         </div>
-        <div class="col-md-3">
-            <label class="control-label">Степен</label>
-            <input type="text" name="degree" class="form-control" value="@Context.Request.Query["degree"]" />
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h3 class="filter-title"><i class="fas fa-filter"></i> Филтрирај наставници</h3>
+            <form asp-action="Index" method="get">
+                <div class="filter-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Име</label>
+                        <input type="text" name="firstName" class="filter-input"
+                               value="@Context.Request.Query["firstName"]"
+                               placeholder="Внесете име..." />
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Презиме</label>
+                        <input type="text" name="lastName" class="filter-input"
+                               value="@Context.Request.Query["lastName"]"
+                               placeholder="Внесете презиме..." />
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Степен</label>
+                        <input type="text" name="degree" class="filter-input"
+                               value="@Context.Request.Query["degree"]"
+                               placeholder="На пр. доктор, магистер..." />
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Ранг</label>
+                        <input type="text" name="academicRank" class="filter-input"
+                               value="@Context.Request.Query["academicRank"]"
+                               placeholder="На пр. професор, доцент..." />
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="search-btn">
+                            <i class="fas fa-search"></i> Пребарај
+                        </button>
+                        <a asp-action="Index" class="reset-btn">Ресетирај</a>
+                    </div>
+                </div>
+            </form>
         </div>
-        <div class="col-md-2">
-            <label class="control-label">Академски ранг</label>
-            <input type="text" name="academicRank" class="form-control" value="@Context.Request.Query["academicRank"]" />
-        </div>
-        <div class="col-md-1 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary w-100">Најди</button>
+
+        <!-- Teachers Table -->
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="teachers-table">
+                    <thead>
+                        <tr>
+                            <th>Наставник</th>
+                            <th>Степен</th>
+                            <th>Ранг</th>
+                            <th>Кабинет</th>
+                            <th>Вработен од</th>
+                            <th>Акции</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="teacher-name-cell">
+                                            <div class="teacher-avatar">
+                                                @item.FirstName[0]@item.LastName[0]
+                                            </div>
+                                            <div class="teacher-info">
+                                                <div class="teacher-name">@item.FirstName @item.LastName</div>
+                                                @if (item.HireDate.HasValue)
+                                                {
+                                                    var daysSinceHire = (DateTime.Now - item.HireDate.Value).TotalDays;
+                                                    if (daysSinceHire < 365)
+                                                    {
+                                                        <span class="badge badge-new">Нов</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-active">Активен</span>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@item.Degree</td>
+                                    <td>@item.AcademicRank</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.OfficeNumber))
+                                        {
+                                            <div style="display: flex; align-items: center; gap: 5px;">
+                                                <i class="fas fa-door-closed" style="color: var(--gray-color); font-size: 12px;"></i>
+                                                <span>@item.OfficeNumber</span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span style="color: var(--gray-color); font-size: 12px;">Не е назначен</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.HireDate.HasValue)
+                                        {
+                                            @item.HireDate.Value.ToString("dd.MM.yyyy")
+                                        }
+                                        else
+                                        {
+                                            <span style="color: var(--gray-color);">Нема податоци</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn action-edit" title="Промени">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="action-btn action-details" title="Детали">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn action-delete" title="Избриши">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <i class="fas fa-user-graduate"></i>
+                                        <h3>Нема пронајдено наставници</h3>
+                                        <p>Пробајте со различни филтри или додадете нов наставник</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</form>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.FirstName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LastName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Degree)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AcademicRank)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.OfficeNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.HireDate)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Degree)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AcademicRank)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OfficeNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.HireDate)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <script>
+        // Додавање интерактивност за филтрите
+        document.addEventListener('DOMContentLoaded', function () {
+            // Reset button functionality
+            const resetBtn = document.querySelector('.reset-btn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const inputs = document.querySelectorAll('.filter-input');
+                    inputs.forEach(input => input.value = '');
+                    window.location.href = '@Url.Action("Index")';
+                });
+            }
+
+            // Add animation to table rows
+            const tableRows = document.querySelectorAll('.teachers-table tbody tr');
+            tableRows.forEach((row, index) => {
+                row.style.animationDelay = `${index * 0.03}s`;
+                row.style.animation = 'fadeIn 0.4s ease forwards';
+            });
+
+            // Add CSS animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @@keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(8px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>
+
+               

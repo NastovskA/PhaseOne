@@ -5,17 +5,26 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PhaseOne.Data;
 using PhaseOne.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.IO;
+
 
 namespace PhaseOne.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class TeachersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public TeachersController(ApplicationDbContext context)
+
+        public TeachersController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
+
 
         // =======================
         // GET: Teachers (LIST + FILTER)
@@ -81,13 +90,64 @@ namespace PhaseOne.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Teacher teacher)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return View(teacher);
+
+            // 1) Дупликат email во Teachers табела
+            if (await _context.Teachers.AnyAsync(t => t.Email == teacher.Email))
             {
-                _context.Add(teacher);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError(nameof(Teacher.Email), "Веќе постои професор со овој е-маил.");
+                return View(teacher);
             }
-            return View(teacher);
+
+            // 2) Дупликат email во Identity
+            if (await _userManager.FindByEmailAsync(teacher.Email) != null)
+            {
+                ModelState.AddModelError(nameof(Teacher.Email), "Веќе постои корисник со овој е-маил во системот.");
+                return View(teacher);
+            }
+
+            // 3) Password мора да е внесен (не се чува во Teachers табела)
+            if (string.IsNullOrWhiteSpace(teacher.Password))
+            {
+                ModelState.AddModelError(nameof(Teacher.Password), "Мора да внесете лозинка за професорот.");
+                return View(teacher);
+            }
+
+            // 4) Креирај Identity user -> лозинката автоматски се хашира
+            var user = new ApplicationUser
+            {
+                UserName = teacher.Email,
+                Email = teacher.Email,
+                EmailConfirmed = true
+            };
+
+            var createResult = await _userManager.CreateAsync(user, teacher.Password);
+            if (!createResult.Succeeded)
+            {
+                foreach (var err in createResult.Errors)
+                    ModelState.AddModelError("", err.Description);
+
+                return View(teacher);
+            }
+
+            // 5) Додели улога Professor
+            var roleResult = await _userManager.AddToRoleAsync(user, "Professor");
+            if (!roleResult.Succeeded)
+            {
+                foreach (var err in roleResult.Errors)
+                    ModelState.AddModelError("", err.Description);
+
+                // избриши user ако не успее role за да не остане “висечки”
+                await _userManager.DeleteAsync(user);
+                return View(teacher);
+            }
+
+            // 6) Дури сега зачувај Teacher во твојата табела
+            _context.Add(teacher);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
         // =======================

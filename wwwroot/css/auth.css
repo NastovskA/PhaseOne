@@ -1,0 +1,79 @@
+﻿/* Wrapper за центрирање */
+.auth-wrapper {
+    min-height: 150vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10rem 10rem;
+}
+
+/* Картичка */
+.card {
+    max-width: 1500px; /* поширока картичка */
+    width: 150%;
+    border-radius: 30px;
+    border: 1px solid rgba(102, 126, 234, 0.18);
+    box-shadow: 0 12px 28px rgba(102, 126, 234, 0.22);
+    background: #fff;
+    margin: 3rem -7rem;
+}
+
+/* Внатрешност на картичката */
+.card-body {
+    padding: 1.5rem 2rem; /* хоризонтално повеќе, вертикално помалку */
+}
+
+/* Наслови */
+h1, h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-weight: 800;
+}
+
+h1 {
+    font-size: 2.4rem;
+}
+
+h2 {
+    font-size: 1.6rem;
+    color: #5a67d8;
+}
+
+/* Инпути */
+.form-control {
+    min-height: 52px;
+    font-size: 1.05rem;
+    padding: 5rem 10rem;
+    border-radius: 12px;
+}
+
+/* Копчиња */
+.btn-primary {
+    width: 100%;
+    border-radius: 12px;
+    padding: 0.9rem 1.8rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, #5a67d8, #764ba2);
+    border: none;
+    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.28);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    margin-bottom: 1rem;
+}
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(102, 126, 234, 0.36);
+    }
+
+/* Линкови */
+a {
+    text-decoration: none;
+    color: #5a67d8;
+    font-weight: 600;
+    transition: color 0.2s ease;    
+}
+
+    a:hover {
+        color: #764ba2;
+    }

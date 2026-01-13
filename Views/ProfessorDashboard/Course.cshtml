@@ -1,0 +1,416 @@
+﻿@model PhaseOne.ViewModels.ProfessorCourseStudentsVm
+
+<div class="container-fluid py-4">
+    <!-- Заглавие -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary mb-0">
+            <i class="bi bi-journal-text me-2"></i>@Model.CourseTitle
+        </h2>
+        <span class="badge bg-primary fs-6">@Model.Enrollments.Count() студенти</span>
+    </div>
+
+    <!-- Пораки -->
+    @if (TempData["Ok"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+            <i class="bi bi-check-circle me-2"></i>@TempData["Ok"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Err"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Err"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Филтер по година -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" asp-action="Course" class="row g-3 align-items-end">
+                <input type="hidden" name="id" value="@Model.CourseId" />
+
+                <div class="col-auto">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-calendar3 me-2"></i>Академска година:
+                    </label>
+                    <select name="year" class="form-select shadow-sm">
+                        @foreach (var y in Model.AvailableYears)
+                        {
+                            <option value="@y" selected="@(y == Model.SelectedYear)">@y</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-auto">
+                    <button class="btn btn-primary shadow-sm" type="submit">
+                        <i class="bi bi-funnel me-2"></i>Прикажи
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Табела со студенти -->
+    @if (!Model.Enrollments.Any())
+    {
+        <div class="alert alert-info border-0 shadow-sm">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-info-circle fs-4 me-3"></i>
+                <div>
+                    <h5 class="mb-1">Нема запишани студенти</h5>
+                    <p class="mb-0 text-muted">Нема студенти запишани за избраната академска година.</p>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light border-0 py-3">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="bi bi-people me-2"></i>Листа на студенти
+                </h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 students-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th><i class="bi bi-hash me-1"></i>Индекс</th>
+                            <th><i class="bi bi-person me-1"></i>Студент</th>
+                            <th class="text-center"><i class="bi bi-clipboard-check me-1"></i>Испит</th>
+                            <th class="text-center"><i class="bi bi-file-text me-1"></i>Семинар</th>
+                            <th class="text-center"><i class="bi bi-folder me-1"></i>Проект</th>
+                            <th class="text-center"><i class="bi bi-plus-circle me-1"></i>Дополнителни</th>
+                            <th class="text-center"><i class="bi bi-award me-1"></i>Оценка</th>
+                            <th class="text-center"><i class="bi bi-calendar-event me-1"></i>Датум</th>
+                            <th class="text-center"><i class="bi bi-circle-fill me-1"></i>Статус</th>
+                            <th class="text-center">Акција</th>
+                            <th><i class="bi bi-link-45deg me-1"></i>Линкови</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in Model.Enrollments)
+                        {
+                            <tr class="@(e.IsActive ? "active-enrollment" : "completed-enrollment")">
+                                <td class="fw-semibold">@e.StudentIndex</td>
+                                <td>@e.StudentName</td>
+
+                                @if (e.IsActive)
+                                {
+                                    <td class="text-center">
+                                        <input form="f_@e.EnrollmentId" class="form-control form-control-sm text-center points-input"
+                                               name="ExamPoints" value="@e.ExamPoints" type="number" min="0" max="100" />
+                                    </td>
+                                    <td class="text-center">
+                                        <input form="f_@e.EnrollmentId" class="form-control form-control-sm text-center points-input"
+                                               name="SeminalPoints" value="@e.SeminalPoints" type="number" min="0" max="100" />
+                                    </td>
+                                    <td class="text-center">
+                                        <input form="f_@e.EnrollmentId" class="form-control form-control-sm text-center points-input"
+                                               name="ProjectPoints" value="@e.ProjectPoints" type="number" min="0" max="100" />
+                                    </td>
+                                    <td class="text-center">
+                                        <input form="f_@e.EnrollmentId" class="form-control form-control-sm text-center points-input"
+                                               name="AdditionalPoints" value="@e.AdditionalPoints" type="number" min="0" max="100" />
+                                    </td>
+                                    <td class="text-center">
+                                        <input form="f_@e.EnrollmentId" class="form-control form-control-sm text-center grade-input"
+                                               name="Grade" value="@e.Grade" placeholder="5-10" type="number" min="5" max="10" />
+                                    </td>
+                                    <td class="text-center">
+                                        <input form="f_@e.EnrollmentId" class="form-control form-control-sm date-input" type="date"
+                                               name="FinishDate"
+                                               value="@(e.FinishDate.HasValue? e.FinishDate.Value.ToString("yyyy-MM-dd") : "")" />
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success px-3 py-2">
+                                            <i class="bi bi-check-circle me-1"></i>Активен
+                                        </span>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <form id="f_@e.EnrollmentId" asp-action="UpdateEnrollment" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="EnrollmentId" value="@e.EnrollmentId" />
+                                            <input type="hidden" name="CourseId" value="@Model.CourseId" />
+                                            <input type="hidden" name="Year" value="@Model.SelectedYear" />
+                                            <button type="submit" class="btn btn-success btn-sm shadow-sm save-btn">
+                                                <i class="bi bi-save me-1"></i>Зачувај
+                                            </button>
+                                        </form>
+                                    </td>
+
+                                    <td>
+                                        <div class="link-container">
+                                            <div class="link-item">
+                                                <span class="link-label">Семинар:</span>
+                                                @if (!string.IsNullOrWhiteSpace(e.SeminalUrl))
+                                                {
+                                                    <a href="@e.SeminalUrl" target="_blank" class="link-badge">
+                                                        <i class="bi bi-box-arrow-up-right"></i>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </div>
+                                            <div class="link-item">
+                                                <span class="link-label">Проект:</span>
+                                                @if (!string.IsNullOrWhiteSpace(e.ProjectUrl))
+                                                {
+                                                    <a href="@e.ProjectUrl" target="_blank" class="link-badge">
+                                                        <i class="bi bi-box-arrow-up-right"></i>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td class="text-center"><span class="points-badge">@(e.ExamPoints ?? 0)</span></td>
+                                    <td class="text-center"><span class="points-badge">@(e.SeminalPoints ?? 0)</span></td>
+                                    <td class="text-center"><span class="points-badge">@(e.ProjectPoints ?? 0)</span></td>
+                                    <td class="text-center"><span class="points-badge">@(e.AdditionalPoints ?? 0)</span></td>
+                                    <td class="text-center">
+                                        @if (e.Grade.HasValue)
+                                        {
+                                            <span class="grade-badge grade-@e.Grade">@e.Grade</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td class="text-center"><small>@(e.FinishDate?.ToString("dd.MM.yyyy") ?? "-")</small></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary px-3 py-2">
+                                            <i class="bi bi-check-all me-1"></i>Завршен
+                                        </span>
+                                    </td>
+                                    <td class="text-center"><span class="text-muted">-</span></td>
+                                    <td>
+                                        <div class="link-container">
+                                            <div class="link-item">
+                                                <span class="link-label">Семинар:</span>
+                                                @if (!string.IsNullOrWhiteSpace(e.SeminalUrl))
+                                                {
+                                                    <a href="@e.SeminalUrl" target="_blank" class="link-badge">
+                                                        <i class="bi bi-box-arrow-up-right"></i>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </div>
+                                            <div class="link-item">
+                                                <span class="link-label">Проект:</span>
+                                                @if (!string.IsNullOrWhiteSpace(e.ProjectUrl))
+                                                {
+                                                    <a href="@e.ProjectUrl" target="_blank" class="link-badge">
+                                                        <i class="bi bi-box-arrow-up-right"></i>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    /* Општи стилови */
+    .students-table {
+        font-size: 0.9rem;
+    }
+
+        .students-table th {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .students-table td {
+            padding: 0.75rem;
+            vertical-align: middle;
+        }
+
+    /* Редови */
+    .active-enrollment {
+        background-color: #f8fff8;
+    }
+
+        .active-enrollment:hover {
+            background-color: #e8f5e9 !important;
+        }
+
+    .completed-enrollment {
+        background-color: #f8f9fa;
+        opacity: 0.85;
+    }
+
+        .completed-enrollment:hover {
+            background-color: #e9ecef !important;
+        }
+
+    /* Input полиња */
+    .points-input,
+    .grade-input,
+    .date-input {
+        max-width: 80px;
+        border: 1px solid #ced4da;
+        transition: all 0.2s ease;
+    }
+
+        .points-input:focus,
+        .grade-input:focus,
+        .date-input:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+        }
+
+    .date-input {
+        max-width: 140px;
+    }
+
+    /* Badge стилови */
+    .points-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background-color: #e7f3ff;
+        color: #0d6efd;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+
+    .grade-badge {
+        display: inline-block;
+        padding: 0.35rem 0.85rem;
+        border-radius: 0.5rem;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .grade-5, .grade-6 {
+        background-color: #fee;
+        color: #c00;
+    }
+
+    .grade-7, .grade-8 {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .grade-9, .grade-10 {
+        background-color: #d1e7dd;
+        color: #0a3622;
+    }
+
+    /* Копчиња */
+    .save-btn {
+        transition: all 0.2s ease;
+        font-weight: 500;
+    }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(25, 135, 84, 0.3) !important;
+        }
+
+    /* Линкови */
+    .link-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .link-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .link-label {
+        font-size: 0.8rem;
+        color: #6c757d;
+        min-width: 60px;
+    }
+
+    .link-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+        background-color: #0d6efd;
+        color: white;
+        border-radius: 0.25rem;
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+    }
+
+        .link-badge:hover {
+            background-color: #0b5ed7;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(13, 110, 253, 0.3);
+            color: white;
+        }
+
+    /* Алерти */
+    .alert {
+        border-radius: 0.5rem;
+    }
+
+    /* Картички */
+    .card {
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
+    /* Форма селект */
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    }
+
+    /* Responsive */
+    @@media (max-width: 1400px) {
+        .students-table {
+            font-size: 0.85rem;
+        }
+
+            .students-table th,
+            .students-table td {
+                padding: 0.5rem 0.4rem;
+            }
+
+        .points-input,
+        .grade-input {
+            max-width: 70px;
+        }
+    }
+</style>

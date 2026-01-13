@@ -1,65 +1,467 @@
 ﻿@model Enrollment
 
-<h2>Edit Enrollment Details</h2>
-
-<form asp-action="EditEnrollmentDetails" method="post">
-    <div asp-validation-summary="All" class="text-danger"></div>
-
-    <input type="hidden" asp-for="Id" />
-    <input type="hidden" asp-for="CourseId" />
-    <input type="hidden" asp-for="StudentId" />
-
-    <div class="form-group mb-3">
-        <label asp-for="Grade" class="form-label"></label>
-        <input asp-for="Grade" class="form-control" />
-        <span asp-validation-for="Grade" class="text-danger"></span>
+<div class="enrollment-edit-container">
+    <div class="enrollment-header">
+        <h2 class="enrollment-title">✏️ Промени детали за запишување</h2>
+        <div class="enrollment-subtitle">
+            Внесете ги деталите за оцените и бодовите на студентот
+        </div>
     </div>
 
-    <div class="form-group mb-3">
-        <label asp-for="ExamPoints" class="form-label"></label>
-        <input asp-for="ExamPoints" class="form-control" />
-        <span asp-validation-for="ExamPoints" class="text-danger"></span>
-    </div>
+    <form asp-action="EditEnrollmentDetails" method="post" class="enrollment-form">
+        <div asp-validation-summary="All" class="validation-summary"></div>
 
-    <div class="form-group mb-3">
-        <label asp-for="SeminalPoints" class="form-label"></label>
-        <input asp-for="SeminalPoints" class="form-control" />
-    </div>
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="CourseId" />
+        <input type="hidden" asp-for="StudentId" />
 
-    <div class="form-group mb-3">
-        <label asp-for="ProjectPoints" class="form-label"></label>
-        <input asp-for="ProjectPoints" class="form-control" />
-    </div>
+        <div class="form-sections">
 
-    <div class="form-group mb-3">
-        <label asp-for="AdditionalPoints" class="form-label"></label>
-        <input asp-for="AdditionalPoints" class="form-control" />
-    </div>
+            <!-- Секција за оцени и бодови -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span class="section-icon">📊</span>
+                    Оцени и бодови
+                </h3>
 
-    <div class="form-group mb-3">
-        <label asp-for="SeminalUrl" class="form-label"></label>
-        <input asp-for="SeminalUrl" class="form-control" />
-    </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label asp-for="Grade" class="form-label">
+                            <span class="label-icon">⭐</span>
+                            Оцена
+                        </label>
+                        <input asp-for="Grade" class="form-control grade-input"
+                               placeholder="Внесете оценка (5-10)" />
+                        <span asp-validation-for="Grade" class="validation-error"></span>
+                    </div>
 
-    <div class="form-group mb-3">
-        <label asp-for="ProjectUrl" class="form-label"></label>
-        <input asp-for="ProjectUrl" class="form-control" />
-    </div>
+                    <div class="form-group">
+                        <label asp-for="ExamPoints" class="form-label">
+                            <span class="label-icon">📝</span>
+                            Бодови од испит
+                        </label>
+                        <input asp-for="ExamPoints" class="form-control points-input"
+                               placeholder="0-100" />
+                        <span asp-validation-for="ExamPoints" class="validation-error"></span>
+                    </div>
 
-    <div class="form-group mb-3">
-        <label asp-for="FinishDate" class="form-label"></label>
-        <input asp-for="FinishDate" type="date" class="form-control" />
-    </div>
+                    <div class="form-group">
+                        <label asp-for="SeminalPoints" class="form-label">
+                            <span class="label-icon">📄</span>
+                            Бодови од семинарска
+                        </label>
+                        <input asp-for="SeminalPoints" class="form-control points-input"
+                               placeholder="0-100" />
+                    </div>
 
-    <div class="form-group mb-3">
-        <label asp-for="Semester" class="form-label"></label>
-        <input asp-for="Semester" class="form-control" />
-    </div>
+                    <div class="form-group">
+                        <label asp-for="ProjectPoints" class="form-label">
+                            <span class="label-icon">📁</span>
+                            Бодови од проект
+                        </label>
+                        <input asp-for="ProjectPoints" class="form-control points-input"
+                               placeholder="0-100" />
+                    </div>
 
-    <div class="form-group mb-3">
-        <label asp-for="Year" class="form-label"></label>
-        <input asp-for="Year" class="form-control" />
-    </div>
+                    <div class="form-group">
+                        <label asp-for="AdditionalPoints" class="form-label">
+                            <span class="label-icon">➕</span>
+                            Дополнителни бодови
+                        </label>
+                        <input asp-for="AdditionalPoints" class="form-control points-input"
+                               placeholder="0-100" />
+                    </div>
+                </div>
+            </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
-</form>
+            <!-- Секција за линкови -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span class="section-icon">🔗</span>
+                    Линкови за задачи
+                </h3>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label asp-for="SeminalUrl" class="form-label">
+                            <span class="label-icon">📎</span>
+                            Линк за семинарска
+                        </label>
+                        <input asp-for="SeminalUrl" class="form-control url-input"
+                               placeholder="https://example.com/seminal" />
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ProjectUrl" class="form-label">
+                            <span class="label-icon">📎</span>
+                            Линк за проект
+                        </label>
+                        <input asp-for="ProjectUrl" class="form-control url-input"
+                               placeholder="https://example.com/project" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Секција за датуми и семестар -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span class="section-icon">📅</span>
+                    Време и период
+                </h3>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label asp-for="FinishDate" class="form-label">
+                            <span class="label-icon">📆</span>
+                            Датум на завршување
+                        </label>
+                        <input asp-for="FinishDate" type="date" class="form-control date-input" />
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Semester" class="form-label">
+                            <span class="label-icon">📚</span>
+                            Семестар
+                        </label>
+                        <select asp-for="Semester" class="form-control semester-select">
+                            <option value="">Изберете семестар</option>
+                            <option value="Winter">Зимски</option>
+                            <option value="Summer">Летен</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Year" class="form-label">
+                            <span class="label-icon">🎓</span>
+                            Година
+                        </label>
+                        <input asp-for="Year" class="form-control year-input"
+                               placeholder="2024" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">
+                <span class="btn-icon">💾</span>
+                Зачувај промени
+            </button>
+            <a href="javascript:history.back()" class="btn-cancel">
+                Откажи
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .enrollment-edit-container {
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 0 15px;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    .enrollment-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        color: white;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .enrollment-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .enrollment-subtitle {
+        font-size: 1rem;
+        opacity: 0.9;
+        font-weight: 400;
+    }
+
+    .enrollment-form {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #eef2f7;
+    }
+
+    .validation-summary {
+        background: #fee;
+        border: 1px solid #fcc;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 25px;
+        color: #c00;
+        font-size: 0.9rem;
+    }
+
+    .form-sections {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .form-section {
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 25px;
+        border: 1px solid #e2e8f0;
+        transition: transform 0.2s ease;
+    }
+
+        .form-section:hover {
+            transform: translateY(-2px);
+            border-color: #cbd5e0;
+        }
+
+    .section-title {
+        font-size: 1.3rem;
+        color: #2d3748;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 10px;
+    }
+
+    .section-icon {
+        font-size: 1.5rem;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 0;
+    }
+
+    .form-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    .label-icon {
+        font-size: 1.1rem;
+        opacity: 0.8;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        background: white;
+        color: #2d3748;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #a0aec0;
+        }
+
+    .grade-input {
+        background: linear-gradient(to right, #fefce8, #fff);
+        border-color: #fbbf24;
+    }
+
+        .grade-input:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+    .points-input {
+        background: linear-gradient(to right, #f0f9ff, #fff);
+        border-color: #93c5fd;
+    }
+
+        .points-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+    .url-input {
+        background: linear-gradient(to right, #f5f3ff, #fff);
+        border-color: #c4b5fd;
+    }
+
+        .url-input:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+    .date-input {
+        background: linear-gradient(to right, #ecfdf5, #fff);
+        border-color: #a7f3d0;
+    }
+
+        .date-input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+    .semester-select {
+        background: linear-gradient(to right, #fef3c7, #fff);
+        border-color: #fcd34d;
+        cursor: pointer;
+    }
+
+        .semester-select:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+    .year-input {
+        background: linear-gradient(to right, #e0e7ff, #fff);
+        border-color: #a5b4fc;
+    }
+
+        .year-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+    .validation-error {
+        color: #dc2626;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        display: block;
+        font-weight: 500;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 40px;
+        padding-top: 25px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 14px 32px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+    .btn-icon {
+        font-size: 1.2rem;
+    }
+
+    .btn-cancel {
+        background: #f1f5f9;
+        color: #64748b;
+        border: 2px solid #cbd5e0;
+        border-radius: 8px;
+        padding: 14px 32px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+        .btn-cancel:hover {
+            background: #e2e8f0;
+            color: #475569;
+            border-color: #94a3b8;
+        }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .enrollment-edit-container {
+            padding: 0 10px;
+        }
+
+        .enrollment-title {
+            font-size: 1.6rem;
+        }
+
+        .enrollment-form {
+            padding: 20px;
+        }
+
+        .form-section {
+            padding: 20px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-submit,
+        .btn-cancel {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .enrollment-header {
+            padding: 15px;
+        }
+
+        .enrollment-title {
+            font-size: 1.4rem;
+        }
+
+        .form-control {
+            padding: 10px 14px;
+        }
+    }
+</style>

@@ -1,98 +1,611 @@
 ﻿@model IEnumerable<Course>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Сите Курсеви";
 }
 
-<h1>Index</h1>
+<!-- СТИЛОВИ -->
+<style>
+    :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #3498db;
+        --accent-color: #2980b9;
+        --light-bg: #f8f9fa;
+        --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --hover-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<form asp-action="Index" method="get" class="border p-3 bg-light mb-4">
-    <div class="row">
-        <div class="col-md-3">
-            <label class="control-label">Наслов</label>
-            <input type="text" name="title" class="form-control" value="@Context.Request.Query["title"]" />
-        </div>
-        <div class="col-md-2">
-            <label class="control-label">Семестар</label>
-            <input type="number" name="semester" class="form-control" value="@Context.Request.Query["semester"]" />
-        </div>
-        <div class="col-md-3">
-            <label class="control-label">Програма</label>
-            <input type="text" name="programme" class="form-control" value="@Context.Request.Query["programme"]" />
-        </div>
-        <div class="col-md-3">
-            <label class="control-label">Наставник</label>
-            <select name="teacherId" class="form-control" asp-items="ViewBag.TeacherId">
-                <option value="">-- Сите наставници --</option>
-            </select>
-        </div>
-        <div class="col-md-1 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary w-100">Најди</button>
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* ХЕДЕР */
+    .courses-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+        color: white;
+        padding: 25px 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        box-shadow: var(--card-shadow);
+    }
+
+        .courses-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .courses-header .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+    .stats-container {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .stat-box {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        padding: 12px 20px;
+        text-align: center;
+        min-width: 100px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        display: block;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* КРЕИРАЊЕ НОВ КУРС */
+    .create-new-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: var(--card-shadow);
+        border-left: 4px solid var(--secondary-color);
+    }
+
+        .create-new-card h3 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+        }
+
+    .btn-create {
+        background: var(--secondary-color);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+    }
+
+        .btn-create:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+            color: white;
+            text-decoration: none;
+        }
+
+    /* ФИЛТЕРИ */
+    .filter-section {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .filter-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+        .filter-header h3 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+    .filter-icon {
+        color: var(--secondary-color);
+        font-size: 1.2rem;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 0.9rem;
+        transition: border-color 0.2s;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+    .btn-filter {
+        background: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 16px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+        .btn-filter:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+
+    .btn-reset {
+        background: #95a5a6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 16px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+        .btn-reset:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+            color: white;
+            text-decoration: none;
+        }
+
+    /* ТАБЕЛА */
+    .courses-table-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        margin-top: 15px;
+    }
+
+    .table {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+        .table thead {
+            background: var(--primary-color);
+        }
+
+            .table thead th {
+                color: white;
+                font-weight: 600;
+                padding: 14px 16px;
+                border: none;
+                font-size: 0.85rem;
+            }
+
+        .table tbody tr {
+            border-bottom: 1px solid #f1f1f1;
+            transition: background-color 0.2s;
+        }
+
+            .table tbody tr:hover {
+                background-color: rgba(52, 152, 219, 0.05);
+            }
+
+        .table tbody td {
+            padding: 14px 16px;
+            vertical-align: middle;
+            color: #333;
+        }
+
+    /* БАЏИ */
+    .badge-semester {
+        background: #3498db;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        display: inline-block;
+    }
+
+    .badge-programme {
+        background: #2ecc71;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        display: inline-block;
+    }
+
+    .badge-credits {
+        background: #e74c3c;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        min-width: 40px;
+        text-align: center;
+        display: inline-block;
+    }
+
+    .teacher-info {
+        font-size: 0.85rem;
+    }
+
+    .teacher-name {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .teacher-role {
+        font-size: 0.8rem;
+        color: #666;
+        font-style: italic;
+    }
+
+    /* АКЦИСКИ КОПЧИЊА */
+    .action-buttons {
+        display: flex;
+        gap: 6px;
+    }
+
+    .btn-action {
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        transition: all 0.2s;
+        border: none;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .btn-edit {
+        background: #f39c12;
+        color: white;
+    }
+
+    .btn-details {
+        background: #27ae60;
+        color: white;
+    }
+
+    .btn-delete {
+        background: #c0392b;
+        color: white;
+    }
+
+    .btn-action:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+        color: white;
+        text-decoration: none;
+    }
+
+    /* НЕМА РЕЗУЛТАТИ */
+    .no-results {
+        text-align: center;
+        padding: 40px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        margin: 20px 0;
+    }
+
+    .no-results-icon {
+        font-size: 3rem;
+        color: #bdc3c7;
+        margin-bottom: 15px;
+    }
+
+    .no-results h3 {
+        color: var(--primary-color);
+        margin-bottom: 10px;
+        font-size: 1.3rem;
+    }
+
+    .no-results p {
+        color: #666;
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .courses-header {
+            padding: 20px;
+            text-align: center;
+        }
+
+            .courses-header h1 {
+                font-size: 1.5rem;
+            }
+
+        .stat-box {
+            flex: 1;
+            min-width: calc(50% - 15px);
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn-action {
+            justify-content: center;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .table thead th,
+        .table tbody td {
+            padding: 10px 12px;
+        }
+    }
+
+    /* АНИМАЦИИ */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .courses-header, .create-new-card, .filter-section, .courses-table-container {
+        animation: fadeIn 0.3s ease-out;
+    }
+</style>
+
+<!-- HTML СОДРЖИНА -->
+<div class="container-fluid px-3 py-3">
+    <!-- ХЕДЕР -->
+    <div class="courses-header">
+        <h1>📚 Сите Курсеви</h1>
+        <p class="subtitle">Управувајте со сите курсеви во системот</p>
+
+        <div class="stats-container">
+            <div class="stat-box">
+                <span class="stat-value">@Model.Count()</span>
+                <span class="stat-label">Вкупно</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">@Model.Where(c => c.Semester % 2 == 1).Count()</span>
+                <span class="stat-label">Зимски</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">@Model.Where(c => c.Semester % 2 == 0).Count()</span>
+                <span class="stat-label">Летни</span>
+            </div>
         </div>
     </div>
-</form>
 
+    <!-- КРЕИРАЊЕ НОВ КУРС -->
+    <div class="create-new-card">
+        <h3>Додади нов курс</h3>
+        <p style="margin-bottom: 15px; color: #666; font-size: 0.9rem;">Додај нов курс во системот со сите потребни информации.</p>
+        <a asp-action="Create" class="btn-create">
+            <i class="fas fa-plus"></i> Креирај нов курс
+        </a>
+    </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Credits)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Semester)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Programme)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EducationLevel)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FirstTeacher)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SecondTeacher)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Credits)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Semester)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Programme)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EducationLevel)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstTeacher.FirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SecondTeacher.FirstName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+    <!-- ФИЛТЕРИ -->
+    <div class="filter-section">
+        <div class="filter-header">
+            <div class="filter-icon">
+                <i class="fas fa-filter"></i>
+            </div>
+            <h3>Филтрирај курсеви</h3>
+        </div>
+
+        <form asp-action="Index" method="get" id="filterForm">
+            <div class="row g-2">
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label fw-bold" style="font-size: 0.9rem;">Наслов</label>
+                    <input type="text"
+                           name="title"
+                           class="form-control"
+                           value="@Context.Request.Query["title"]"
+                           placeholder="Пребарај по наслов..." />
+                </div>
+                <div class="col-md-2 col-sm-6">
+                    <label class="form-label fw-bold" style="font-size: 0.9rem;">Семестар</label>
+                    <input type="number"
+                           name="semester"
+                           class="form-control"
+                           value="@Context.Request.Query["semester"]"
+                           placeholder="Бр."
+                           min="1" max="8" />
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label fw-bold" style="font-size: 0.9rem;">Програма</label>
+                    <input type="text"
+                           name="programme"
+                           class="form-control"
+                           value="@Context.Request.Query["programme"]"
+                           placeholder="Внеси програма..." />
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label fw-bold" style="font-size: 0.9rem;">Наставник</label>
+                    <select name="teacherId" class="form-select">
+                        <option value="">-- Сите наставници --</option>
+                        @if (ViewBag.TeacherId != null)
+                        {
+                            foreach (SelectListItem teacher in ViewBag.TeacherId)
+                            {
+                                <option value="@teacher.Value">@teacher.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+             </div>
+
+            <div class="row g-2 mt-3">
+                <div class="col-md-2 col-sm-6">
+                    <button type="submit" class="btn-filter">
+                        <i class="fas fa-search"></i> Филтрирај
+                    </button>
+                </div>
+                <div class="col-md-2 col-sm-6">
+                    <a asp-action="Index" class="btn-reset">
+                        <i class="fas fa-redo"></i> Ресетирај
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- ТАБЕЛА СО КУРСЕВИ -->
+    @if (Model.Any())
+    {
+        <div class="courses-table-container">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Наслов</th>
+                            <th>Кредити</th>
+                            <th>Семестар</th>
+                            <th>Програма</th>
+                            <th>Степен</th>
+                            <th>Прв наставник</th>
+                            <th>Втор наставник</th>
+                            <th>Акции</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong style="color: var(--primary-color);">@Html.DisplayFor(modelItem => item.Title)</strong>
+                                </td>
+                                <td>
+                                    <span class="badge-credits">@Html.DisplayFor(modelItem => item.Credits)</span>
+                                </td>
+                                <td>
+                                    <span class="badge-semester">
+                                        @Html.DisplayFor(modelItem => item.Semester)
+                                        @(item.Semester % 2 == 1 ? "зимски" : "летен")
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge-programme">@Html.DisplayFor(modelItem => item.Programme)</span>
+                                </td>
+                                <td>
+                                    <span style="font-weight: 600;">@Html.DisplayFor(modelItem => item.EducationLevel)</span>
+                                </td>
+                                <td>
+                                    @if (item.FirstTeacher != null)
+                                    {
+                                        <div class="teacher-info">
+                                            <span class="teacher-name">@item.FirstTeacher.FirstName @item.FirstTeacher.LastName</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span style="color: #999; font-size: 0.85rem;">Не е доделен</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.SecondTeacher != null)
+                                    {
+                                        <div class="teacher-info">
+                                            <span class="teacher-name">@item.SecondTeacher.FirstName @item.SecondTeacher.LastName</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span style="color: #999; font-size: 0.85rem;">Не е доделен</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn-action btn-edit">
+                                            <i class="fas fa-edit"></i> Уреди
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn-action btn-details">
+                                            <i class="fas fa-info-circle"></i> Детали
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn-action btn-delete">
+                                            <i class="fas fa-trash-alt"></i> Избриши
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- НЕМА РЕЗУЛТАТИ -->
+        <div class="no-results">
+            <div class="no-results-icon">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <h3>Не се пронајдени курсеви</h3>
+            <p>Нема курсеви што одговараат на вашите критериуми за пребарување.</p>
+            <a asp-action="Index" class="btn btn-primary mt-2" style="background: var(--secondary-color); border: none; padding: 8px 20px;">
+                <i class="fas fa-redo"></i> Врати се на сите курсеви
+            </a>
+        </div>
+    }
+</div>
+
+<!-- FONTAWESOME ЗА ИКОНИ -->
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 }
-    </tbody>
-</table>

@@ -3,9 +3,13 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PhaseOne.Data;
 using PhaseOne.Models;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace PhaseOne.Controllers
 {
+    [Authorize(Roles = "Admin")]
+    
     public class CoursesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -247,5 +251,136 @@ namespace PhaseOne.Controllers
         {
             return _context.Courses.Any(e => e.Id == id);
         }
+
+
+
+        [Authorize(Roles = "Admin")]
+
+        public IActionResult AdminEditEnrollments(int courseId)
+        {
+            var course = _context.Courses
+                .Include(c => c.Enrollments)
+                .ThenInclude(e => e.Student)
+                .FirstOrDefault(c => c.Id == courseId);
+
+            if (course == null) return NotFound();
+
+            var allStudents = _context.Students.ToList();
+
+            var vm = new CourseEnrollmentViewModel
+            {
+                CourseId = courseId,
+                Year = DateTime.Now.Year,
+                Semester = "Winter",
+                Students = allStudents.Select(s => new SelectableStudent
+                {
+                    StudentId = s.Id,
+                    FullName = s.StudentId + " - " + s.FirstName + " " + s.LastName,
+                    IsEnrolled = false // ќе го решиме во следен чекор
+                }).ToList()
+            };
+
+            ViewBag.CourseTitle = course.Title;
+            return View(vm);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public IActionResult AdminUpdateEnrollments(int courseId, int year, string semester, List<long> selectedStudentIds)
+        {
+            // постоечки enrollments за ова course + year + semester
+            var existing = _context.Enrollments
+                .Where(e => e.CourseId == courseId && e.Year == year && e.Semester == semester)
+                .ToList();
+
+            foreach (var studentId in selectedStudentIds)
+            {
+                bool already = existing.Any(e => e.StudentId == studentId);
+                if (!already)
+                {
+                    _context.Enrollments.Add(new Enrollment
+                    {
+                        CourseId = courseId,
+                        StudentId = studentId,
+                        Year = year,
+                        Semester = semester
+                        // останато null
+                    });
+                }
+            }
+
+            _context.SaveChanges();
+            return RedirectToAction("Details", new { id = courseId });
+        }
+
+        [Authorize(Roles = "Admin")]
+        public IActionResult AdminDeactivateEnrollments(int courseId, int year, string semester)
+        {
+            var course = _context.Courses.FirstOrDefault(c => c.Id == courseId);
+            if (course == null) return NotFound();
+
+            var active = _context.Enrollments
+                .Where(e => e.CourseId == courseId
+                            && e.Year == year
+                            && e.Semester == semester
+                            && e.FinishDate == null)
+                .Select(e => new EnrollmentDeactivateItem
+                {
+                    EnrollmentId = e.Id,
+                    StudentId = e.StudentId,
+                    StudentDisplay = e.Student.StudentId + " - " + e.Student.FirstName + " " + e.Student.LastName
+                })
+                .ToList();
+
+            var vm = new AdminDeactivateEnrollmentsViewModel
+            {
+                CourseId = courseId,
+                Year = year,
+                Semester = semester,
+                FinishDate = DateTime.Today,
+                Enrollments = active
+            };
+
+            ViewBag.CourseTitle = course.Title;
+            return View(vm);
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public IActionResult AdminDeactivateEnrollments(AdminDeactivateEnrollmentsViewModel vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                // ако има грешка, мора повторно да ја наполниме листата
+                vm.Enrollments = _context.Enrollments
+                    .Where(e => e.CourseId == vm.CourseId
+                                && e.Year == vm.Year
+                                && e.Semester == vm.Semester
+                                && e.FinishDate == null)
+                    .Select(e => new EnrollmentDeactivateItem
+                    {
+                        EnrollmentId = e.Id,
+                        StudentId = e.StudentId,
+                        StudentDisplay = e.Student.StudentId + " - " + e.Student.FirstName + " " + e.Student.LastName
+                    })
+                    .ToList();
+
+                return View(vm);
+            }
+
+            var rows = _context.Enrollments
+                .Where(e => vm.SelectedEnrollmentIds.Contains(e.Id) && e.FinishDate == null)
+                .ToList();
+
+            foreach (var e in rows)
+                e.FinishDate = vm.FinishDate;
+
+            _context.SaveChanges();
+            return RedirectToAction("Details", new { id = vm.CourseId });
+        }
+
     }
 }

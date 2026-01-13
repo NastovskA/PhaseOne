@@ -1,99 +1,329 @@
 ﻿@model IEnumerable<PhaseOne.Models.Student>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Студенти";
 }
 
-<h1>Index</h1>
+<style>
+    .students-container {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 25px;
+        margin: 20px auto;
+        max-width: 1400px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+    }
 
-<form asp-action="Index" method="get" class="border p-3 bg-light mb-4">
-    <div class="row">
-        <div class="col-md-2">
-            <label class="control-label">Индекс</label>
-            <input type="text" name="studentId" class="form-control" value="@Context.Request.Query["studentId"]" />
-        </div>
-        <div class="col-md-3">
-            <label class="control-label">Име</label>
-            <input type="text" name="firstName" class="form-control" value="@Context.Request.Query["firstName"]" />
-        </div>
-        <div class="col-md-3">
-            <label class="control-label">Презиме</label>
-            <input type="text" name="lastName" class="form-control" value="@Context.Request.Query["lastName"]" />
-        </div>
-        <div class="col-md-3">
-            <label class="control-label">Предмет</label>
-            <select name="courseId" class="form-control" asp-items="ViewBag.CourseId">
-                <option value="">-- Сите предмети --</option>
-            </select>
-        </div>
-        <div class="col-md-1 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary w-100">Најди</button>
-        </div>
+    .page-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .btn-create {
+        background-color: #3498db;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-create:hover {
+            background-color: #2980b9;
+            color: white;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.2);
+        }
+
+    .filter-section {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border: 1px solid #e9ecef;
+    }
+
+    .filter-title {
+        color: #495057;
+        font-weight: 600;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+    }
+
+    .filter-form .row {
+        margin-bottom: -15px;
+    }
+
+    .filter-form .col-md-2,
+    .filter-form .col-md-3,
+    .filter-form .col-md-1 {
+        margin-bottom: 15px;
+    }
+
+    .filter-form label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 6px;
+        font-size: 0.9rem;
+    }
+
+    .filter-form input,
+    .filter-form select {
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        transition: border-color 0.2s;
+    }
+
+        .filter-form input:focus,
+        .filter-form select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+    .btn-filter {
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 20px;
+        font-weight: 500;
+        width: 100%;
+        transition: all 0.3s ease;
+        height: 38px;
+    }
+
+        .btn-filter:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.2);
+        }
+
+    .students-table {
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        border: 1px solid #e9ecef;
+    }
+
+        .students-table table {
+            margin-bottom: 0;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .students-table thead {
+            background-color: #2c3e50;
+        }
+
+            .students-table thead th {
+                color: white;
+                font-weight: 600;
+                padding: 15px 12px;
+                border: none;
+                font-size: 0.95rem;
+                vertical-align: middle;
+            }
+
+        .students-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+            .students-table tbody tr:hover {
+                background-color: #f8f9fa;
+            }
+
+        .students-table tbody td {
+            padding: 12px;
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+            color: #495057;
+            font-size: 0.95rem;
+        }
+
+            .students-table tbody td:first-child {
+                font-weight: 500;
+                color: #2c3e50;
+            }
+
+    .action-links {
+        display: flex;
+        gap: 12px;
+    }
+
+    .action-link {
+        padding: 4px 10px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .link-edit {
+        background-color: #f1c40f;
+        color: #2c3e50;
+    }
+
+        .link-edit:hover {
+            background-color: #f39c12;
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+    .link-details {
+        background-color: #3498db;
+        color: white;
+    }
+
+        .link-details:hover {
+            background-color: #2980b9;
+            color: white;
+            text-decoration: none;
+        }
+
+    .link-delete {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+        .link-delete:hover {
+            background-color: #c0392b;
+            color: white;
+            text-decoration: none;
+        }
+
+    .no-data {
+        text-align: center;
+        padding: 40px;
+        color: #7f8c8d;
+        font-style: italic;
+    }
+
+    .stats-badge {
+        background-color: #ecf0f1;
+        color: #2c3e50;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+</style>
+
+<div class="students-container">
+    <div class="page-header">
+        <h1 class="page-title">Студенти</h1>
+        <a asp-action="Create" class="btn-create">
+            <span>+</span> Додади нов студент
+        </a>
     </div>
-</form>
 
+    <div class="filter-section">
+        <div class="filter-title">Филтрирај студенти</div>
+        <form asp-action="Index" method="get" class="filter-form">
+            <div class="row">
+                <div class="col-md-2">
+                    <label class="control-label">Индекс</label>
+                    <input type="text" name="studentId" class="form-control"
+                           value="@Context.Request.Query["studentId"]"
+                           placeholder="Внесете индекс" />
+                </div>
+                <div class="col-md-3">
+                    <label class="control-label">Име</label>
+                    <input type="text" name="firstName" class="form-control"
+                           value="@Context.Request.Query["firstName"]"
+                           placeholder="Внесете име" />
+                </div>
+                <div class="col-md-3">
+                    <label class="control-label">Презиме</label>
+                    <input type="text" name="lastName" class="form-control"
+                           value="@Context.Request.Query["lastName"]"
+                           placeholder="Внесете презиме" />
+                </div>
+                <div class="col-md-3">
+                    <label class="control-label">Предмет</label>
+                    <select name="courseId" class="form-control" asp-items="ViewBag.CourseId">
+                        <option value="">-- Сите предмети --</option>
+                    </select>
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn-filter">Најди</button>
+                </div>
+            </div>
+        </form>
+    </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.StudentId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FirstName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LastName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EnrollmentDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AcquiredCredits)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CurrentSemestar)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EducationLevel)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.StudentId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EnrollmentDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AcquiredCredits)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CurrentSemestar)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EducationLevel)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="students-table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.StudentId)</th>
+                    <th>@Html.DisplayNameFor(model => model.FirstName)</th>
+                    <th>@Html.DisplayNameFor(model => model.LastName)</th>
+                    <th>@Html.DisplayNameFor(model => model.EnrollmentDate)</th>
+                    <th>@Html.DisplayNameFor(model => model.AcquiredCredits)</th>
+                    <th>@Html.DisplayNameFor(model => model.CurrentSemestar)</th>
+                    <th>@Html.DisplayNameFor(model => model.EducationLevel)</th>
+                    <th>Акции</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <span class="stats-badge">@Html.DisplayFor(modelItem => item.StudentId)</span>
+                            </td>
+                            <td>@Html.DisplayFor(modelItem => item.FirstName)</td>
+                            <td>@Html.DisplayFor(modelItem => item.LastName)</td>
+                            <td>@Html.DisplayFor(modelItem => item.EnrollmentDate)</td>
+                            <td>
+                                <span class="stats-badge">@Html.DisplayFor(modelItem => item.AcquiredCredits)</span>
+                            </td>
+                            <td>
+                                <span class="stats-badge">@Html.DisplayFor(modelItem => item.CurrentSemestar)</span>
+                            </td>
+                            <td>@Html.DisplayFor(modelItem => item.EducationLevel)</td>
+                            <td>
+                                <div class="action-links">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="action-link link-edit">Промени</a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="action-link link-details">Детали</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="action-link link-delete">Избриши</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="no-data">
+                            Нема пронајдени студенти. Пробајте со други филтри или
+                            <a asp-action="Create">додадете нов студент</a>.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

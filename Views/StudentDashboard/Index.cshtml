@@ -1,0 +1,320 @@
+﻿@using System
+@model IEnumerable<dynamic>
+
+<style>
+    .subjects-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid #007bff;
+    }
+
+        .page-header h2 {
+            color: #2c3e50;
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+    .alert {
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        border-radius: 8px;
+        border-left: 4px solid;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border-color: #28a745;
+        color: #155724;
+    }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        border-color: #17a2b8;
+        color: #0c5460;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        background: white;
+    }
+
+    .custom-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+        .custom-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+            .custom-table thead th {
+                padding: 1rem 0.75rem;
+                font-weight: 600;
+                text-align: left;
+                white-space: nowrap;
+                border: none;
+                text-transform: uppercase;
+                font-size: 0.75rem;
+                letter-spacing: 0.5px;
+            }
+
+                .custom-table thead th:first-child {
+                    border-top-left-radius: 12px;
+                }
+
+                .custom-table thead th:last-child {
+                    border-top-right-radius: 12px;
+                }
+
+        .custom-table tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+            .custom-table tbody tr:hover {
+                background-color: #f8f9fa;
+                transform: scale(1.01);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            .custom-table tbody tr:last-child {
+                border-bottom: none;
+            }
+
+        .custom-table tbody td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+            border: none;
+        }
+
+    .points-cell {
+        font-weight: 600;
+        color: #495057;
+        text-align: center;
+    }
+
+    .badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+    }
+
+    .badge-active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .badge-finished {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .link-cell a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+        .link-cell a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .link-cell a::before {
+            content: "🔗";
+            font-size: 0.8rem;
+        }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-edit:active {
+            transform: translateY(0);
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+
+    .grade-display {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #28a745;
+    }
+
+    .course-title {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    @@media (max-width: 768px) {
+        .subjects-container {
+            padding: 1rem;
+        }
+
+        .custom-table {
+            font-size: 0.8rem;
+        }
+
+            .custom-table thead th,
+            .custom-table tbody td {
+                padding: 0.5rem 0.4rem;
+            }
+
+        .btn-edit {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+        }
+    }
+</style>
+
+<div class="subjects-container">
+    <div class="page-header">
+        <h2>📚 Мои предмети</h2>
+    </div>
+
+    @if (TempData["Ok"] != null)
+    {
+        <div class="alert alert-success">@TempData["Ok"]</div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <strong>Информација:</strong> Немате запишани предмети.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Предмет</th>
+                        <th>Година</th>
+                        <th>Семестар</th>
+                        <th>Exam</th>
+                        <th>Seminar</th>
+                        <th>Project</th>
+                        <th>Additional</th>
+                        <th>Оценка</th>
+                        <th>FinishDate</th>
+                        <th>Статус</th>
+                        <th>Seminar URL</th>
+                        <th>Project URL</th>
+                        <th>Акција</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in Model)
+                    {
+                        <tr>
+                            <td class="course-title">@e.CourseTitle</td>
+                            <td>@e.Year</td>
+                            <td>@e.Semester</td>
+                            <td class="points-cell">@(e.ExamPoints ?? 0)</td>
+                            <td class="points-cell">@(e.SeminalPoints ?? 0)</td>
+                            <td class="points-cell">@(e.ProjectPoints ?? 0)</td>
+                            <td class="points-cell">@(e.AdditionalPoints ?? 0)</td>
+                            <td class="grade-display">@(e.Grade?.ToString() ?? "-")</td>
+                            <td>@(e.FinishDate != null ? ((DateTime)e.FinishDate).ToString("yyyy-MM-dd") : "-")</td>
+                            <td>
+                                @if (e.IsActive)
+                                {
+                                    <span class="badge badge-active">Активен</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-finished">Завршен</span>
+                                }
+                            </td>
+                            <td class="link-cell">
+                                @if (!string.IsNullOrWhiteSpace(e.SeminalUrl))
+                                {
+                                    <a href="@e.SeminalUrl" target="_blank">преглед</a>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td class="link-cell">
+                                @if (!string.IsNullOrWhiteSpace(e.ProjectUrl))
+                                {
+                                    <a href="@e.ProjectUrl" target="_blank">GitHub</a>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td>
+                                <a class="btn-edit"
+                                   asp-action="EditLinks"
+                                   asp-route-enrollmentId="@e.EnrollmentId">
+                                    Уреди линкови
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

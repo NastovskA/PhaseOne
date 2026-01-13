@@ -6,10 +6,11 @@
 
 using PhaseOne.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace PhaseOne.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -63,25 +64,173 @@ namespace PhaseOne.Data
 
 
             modelBuilder.Entity<Student>().HasData(
-                new Student { Id = 1, StudentId = "2025001", FirstName = "Elena", LastName = "Kostova", EnrollmentDate = new DateTime(2022, 10, 1), AcquiredCredits = 60, CurrentSemestar = 3, EducationLevel = "Bachelor" },
-                new Student { Id = 2, StudentId = "2025002", FirstName = "Ivan", LastName = "Nikolov", EnrollmentDate = new DateTime(2021, 10, 1), AcquiredCredits = 120, CurrentSemestar = 5, EducationLevel = "Bachelor" },
-                new Student { Id = 3, StudentId = "2025003", FirstName = "Marija", LastName = "Stojanova", EnrollmentDate = new DateTime(2023, 10, 1), AcquiredCredits = 30, CurrentSemestar = 2, EducationLevel = "Bachelor" },
-                new Student { Id = 4, StudentId = "2025004", FirstName = "Petar", LastName = "Iliev", EnrollmentDate = new DateTime(2020, 10, 1), AcquiredCredits = 180, CurrentSemestar = 7, EducationLevel = "Bachelor" },
-                new Student { Id = 5, StudentId = "2025005", FirstName = "Simona", LastName = "Georgieva", EnrollmentDate = new DateTime(2022, 10, 1), AcquiredCredits = 90, CurrentSemestar = 4, EducationLevel = "Bachelor" },
-                new Student { Id = 6, StudentId = "2025006", FirstName = "Aleksandar", LastName = "Trajkovski", EnrollmentDate = new DateTime(2021, 10, 1), AcquiredCredits = 150, CurrentSemestar = 6, EducationLevel = "Bachelor" },
-                new Student { Id = 7, StudentId = "2025007", FirstName = "Sara", LastName = "Mitreva", EnrollmentDate = new DateTime(2023, 10, 1), AcquiredCredits = 15, CurrentSemestar = 1, EducationLevel = "Bachelor" }
-            );
+    new Student
+    {
+        Id = 1,
+        StudentId = "2025001",
+        FirstName = "Elena",
+        LastName = "Kostova",
+        Email = "elena.kostova@feit.ukim.edu.mk",
+        EnrollmentDate = new DateTime(2022, 10, 1),
+        AcquiredCredits = 60,
+        CurrentSemestar = 3,
+        EducationLevel = "Bachelor"
+    },
+    new Student
+    {
+        Id = 2,
+        StudentId = "2025002",
+        FirstName = "Ivan",
+        LastName = "Nikolov",
+        Email = "ivan.nikolov@feit.ukim.edu.mk",
+        EnrollmentDate = new DateTime(2021, 10, 1),
+        AcquiredCredits = 120,
+        CurrentSemestar = 5,
+        EducationLevel = "Bachelor"
+    },
+    new Student
+    {
+        Id = 3,
+        StudentId = "2025003",
+        FirstName = "Marija",
+        LastName = "Stojanova",
+        Email = "marija.stojanova@feit.ukim.edu.mk",
+        EnrollmentDate = new DateTime(2023, 10, 1),
+        AcquiredCredits = 30,
+        CurrentSemestar = 2,
+        EducationLevel = "Bachelor"
+    },
+    new Student
+    {
+        Id = 4,
+        StudentId = "2025004",
+        FirstName = "Petar",
+        LastName = "Iliev",
+        Email = "petar.iliev@feit.ukim.edu.mk",
+        EnrollmentDate = new DateTime(2020, 10, 1),
+        AcquiredCredits = 180,
+        CurrentSemestar = 7,
+        EducationLevel = "Bachelor"
+    },
+    new Student
+    {
+        Id = 5,
+        StudentId = "2025005",
+        FirstName = "Simona",
+        LastName = "Georgieva",
+        Email = "simona.georgieva@feit.ukim.edu.mk",
+        EnrollmentDate = new DateTime(2022, 10, 1),
+        AcquiredCredits = 90,
+        CurrentSemestar = 4,
+        EducationLevel = "Bachelor"
+    },
+    new Student
+    {
+        Id = 6,
+        StudentId = "2025006",
+        FirstName = "Aleksandar",
+        LastName = "Trajkovski",
+        Email = "aleksandar.trajkovski@feit.ukim.edu.mk",
+        EnrollmentDate = new DateTime(2021, 10, 1),
+        AcquiredCredits = 150,
+        CurrentSemestar = 6,
+        EducationLevel = "Bachelor"
+    },
+    new Student
+    {
+        Id = 7,
+        StudentId = "2025007",
+        FirstName = "Sara",
+        LastName = "Mitreva",
+        Email = "sara.mitreva@feit.ukim.edu.mk",
+        EnrollmentDate = new DateTime(2023, 10, 1),
+        AcquiredCredits = 15,
+        CurrentSemestar = 1,
+        EducationLevel = "Bachelor"
+    }
+);
 
 
             modelBuilder.Entity<Teacher>().HasData(
-                new Teacher { Id = 1, FirstName = "Lila", LastName = "Petrova", Degree = "PhD", AcademicRank = "Professor", OfficeNumber = "101", HireDate = new DateTime(2015, 9, 1) },
-                new Teacher { Id = 2, FirstName = "Marko", LastName = "Stojanovski", Degree = "MSc", AcademicRank = "Assistant", OfficeNumber = "102", HireDate = new DateTime(2018, 2, 15) },
-                new Teacher { Id = 3, FirstName = "Ivana", LastName = "Koleva", Degree = "PhD", AcademicRank = "Associate Professor", OfficeNumber = "103", HireDate = new DateTime(2016, 5, 10) },
-                new Teacher { Id = 4, FirstName = "Stefan", LastName = "Jovanov", Degree = "MSc", AcademicRank = "Assistant", OfficeNumber = "104", HireDate = new DateTime(2019, 1, 20) },
-                new Teacher { Id = 5, FirstName = "Biljana", LastName = "Ristova", Degree = "PhD", AcademicRank = "Professor", OfficeNumber = "105", HireDate = new DateTime(2014, 11, 5) },
-                new Teacher { Id = 6, FirstName = "Miki", LastName = "Todorov", Degree = "MSc", AcademicRank = "Assistant", OfficeNumber = "106", HireDate = new DateTime(2020, 3, 12) },
-                new Teacher { Id = 7, FirstName = "Dragana", LastName = "Spasova", Degree = "PhD", AcademicRank = "Associate Professor", OfficeNumber = "107", HireDate = new DateTime(2017, 7, 7) }
+                new Teacher
+                {
+                    Id = 1,
+                    FirstName = "Lila",
+                    LastName = "Petrova",
+                    Email = "lila.petrova@feit.ukim.edu.mk",
+                    Degree = "PhD",
+                    AcademicRank = "Professor",
+                    OfficeNumber = "101",
+                    HireDate = new DateTime(2015, 9, 1)
+                },
+                new Teacher
+                {
+                    Id = 2,
+                    FirstName = "Marko",
+                    LastName = "Stojanovski",
+                    Email = "marko.stojanovski@feit.ukim.edu.mk",
+                    Degree = "MSc",
+                    AcademicRank = "Assistant",
+                    OfficeNumber = "102",
+                    HireDate = new DateTime(2018, 2, 15)
+                },
+                new Teacher
+                {
+                    Id = 3,
+                    FirstName = "Ivana",
+                    LastName = "Koleva",
+                    Email = "ivana.koleva@feit.ukim.edu.mk",
+                    Degree = "PhD",
+                    AcademicRank = "Associate Professor",
+                    OfficeNumber = "103",
+                    HireDate = new DateTime(2016, 5, 10)
+                },
+                new Teacher
+                {
+                    Id = 4,
+                    FirstName = "Stefan",
+                    LastName = "Jovanov",
+                    Email = "stefan.jovanov@feit.ukim.edu.mk",
+                    Degree = "MSc",
+                    AcademicRank = "Assistant",
+                    OfficeNumber = "104",
+                    HireDate = new DateTime(2019, 1, 20)
+                },
+                new Teacher
+                {
+                    Id = 5,
+                    FirstName = "Biljana",
+                    LastName = "Ristova",
+                    Email = "biljana.ristova@feit.ukim.edu.mk",
+                    Degree = "PhD",
+                    AcademicRank = "Professor",
+                    OfficeNumber = "105",
+                    HireDate = new DateTime(2014, 11, 5)
+                },
+                new Teacher
+                {
+                    Id = 6,
+                    FirstName = "Miki",
+                    LastName = "Todorov",
+                    Email = "miki.todorov@feit.ukim.edu.mk",
+                    Degree = "MSc",
+                    AcademicRank = "Assistant",
+                    OfficeNumber = "106",
+                    HireDate = new DateTime(2020, 3, 12)
+                },
+                new Teacher
+                {
+                    Id = 7,
+                    FirstName = "Dragana",
+                    LastName = "Spasova",
+                    Email = "dragana.spasova@feit.ukim.edu.mk",
+                    Degree = "PhD",
+                    AcademicRank = "Associate Professor",
+                    OfficeNumber = "107",
+                    HireDate = new DateTime(2017, 7, 7)
+                }
             );
+
 
 
 

@@ -1,8 +1,175 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="dash-wrap">
+    <div class="dash-container">
+
+        <div class="dash-hero">
+            <div>
+                <h1 class="dash-title">Dashboard</h1>
+
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <p class="dash-sub">
+                        Logged in as <span class="dash-user">@User.Identity.Name</span>
+                    </p>
+                }
+                else
+                {
+                    <p class="dash-sub">Please log in to access the system.</p>
+                }
+            </div>
+        </div>
+
+        @* ======= NOT LOGGED IN ======= *@
+        @if (!(User.Identity?.IsAuthenticated ?? false))
+        {
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-icon">🔐</div>
+                    <div>
+                        <h2 class="panel-title">Welcome</h2>
+                        <p class="panel-desc">Log in or register to continue.</p>
+                    </div>
+                </div>
+
+                <div class="panel-actions">
+                    <a class="btnx btnx-primary"
+                       asp-area="Identity"
+                       asp-page="/Account/Login">
+                        Log in
+                    </a>
+
+                    <a class="btnx btnx-ghost"
+                       asp-area="Identity"
+                       asp-page="/Account/Register">
+                        Register
+                    </a>
+                </div>
+            </div>
+
+            return;
+        }
+
+        @* ======= ADMIN DASHBOARD ======= *@
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="section-head">
+                <h2 class="section-title">Administrator</h2>
+                <p class="section-sub">Choose a module to manage the system.</p>
+            </div>
+
+            <div class="grid">
+                <a class="cardx" asp-controller="Students" asp-action="Index">
+                    <div class="cardx-top">
+                        <div class="badge">Admin</div>
+                        <div class="emoji">🎓</div>
+                    </div>
+                    <h3 class="cardx-title">Students</h3>
+                    <p class="cardx-desc">View, add, edit and delete students.</p>
+                    <div class="cardx-cta">Open →</div>
+                </a>
+
+                <a class="cardx" asp-controller="Teachers" asp-action="Index">
+                    <div class="cardx-top">
+                        <div class="badge">Admin</div>
+                        <div class="emoji">👨‍🏫</div>
+                    </div>
+                    <h3 class="cardx-title">Teachers</h3>
+                    <p class="cardx-desc">Manage teachers and their information.</p>
+                    <div class="cardx-cta">Open →</div>
+                </a>
+
+                <a class="cardx" asp-controller="Courses" asp-action="Index">
+                    <div class="cardx-top">
+                        <div class="badge">Admin</div>
+                        <div class="emoji">📚</div>
+                    </div>
+                    <h3 class="cardx-title">Courses</h3>
+                    <p class="cardx-desc">Manage courses, semesters and teachers.</p>
+                    <div class="cardx-cta">Open →</div>
+                </a>
+
+                <a class="cardx cardx-wide" asp-controller="Courses" asp-action="Index">
+                    <div class="cardx-top">
+                        <div class="badge badge-alt">Enroll</div>
+                        <div class="emoji">🧾</div>
+                    </div>
+                    <h3 class="cardx-title">Enroll students (Year/Semester)</h3>
+                    <p class="cardx-desc">
+                        Select a course, then enroll students for a specific year and semester.
+                        Other enrollment fields remain empty (null).
+                    </p>
+                    <div class="cardx-cta">Go to courses → details → enroll →</div>
+                </a>
+
+                <a class="cardx cardx-wide" asp-controller="Courses" asp-action="Index">
+                    <div class="cardx-top">
+                        <div class="badge badge-danger">Deactivate</div>
+                        <div class="emoji">⛔</div>
+                    </div>
+                    <h3 class="cardx-title">Deactivate students (Finish Date)</h3>
+                    <p class="cardx-desc">
+                        Deactivate one or more students from a course by setting FinishDate.
+                        Active = FinishDate is null.
+                    </p>
+                    <div class="cardx-cta">Go to courses → details → deactivate →</div>
+                </a>
+
+                <a class="cardx" asp-controller="SeminarWorks" asp-action="Index">
+                    <div class="cardx-top">
+                        <div class="badge">Admin</div>
+                        <div class="emoji">📎</div>
+                    </div>
+                    <h3 class="cardx-title">SeminarWorks</h3>
+                    <p class="cardx-desc">Browse and review uploaded seminar works.</p>
+                    <div class="cardx-cta">Open →</div>
+                </a>
+            </div>
+        }
+
+        @* ======= TEACHER DASHBOARD ======= *@
+        @if (User.IsInRole("Teacher"))
+        {
+            <div class="section-head">
+                <h2 class="section-title">Teacher</h2>
+                <p class="section-sub">Your teaching tools.</p>
+            </div>
+
+            <div class="grid">
+                <a class="cardx" asp-controller="Courses" asp-action="Index">
+                    <div class="cardx-top">
+                        <div class="badge">Teacher</div>
+                        <div class="emoji">📘</div>
+                    </div>
+                    <h3 class="cardx-title">My Courses</h3>
+                    <p class="cardx-desc">View courses that you teach.</p>
+                    <div class="cardx-cta">Open →</div>
+                </a>
+            </div>
+        }
+
+        @* ======= STUDENT DASHBOARD ======= *@
+        @if (User.IsInRole("Student"))
+        {
+            <div class="section-head">
+                <h2 class="section-title">Student</h2>
+                <p class="section-sub">Your studies and enrolled courses.</p>
+            </div>
+
+            <div class="grid">
+                <a class="cardx" asp-controller="Enrollments" asp-action="My">
+                    <div class="cardx-top">
+                        <div class="badge">Student</div>
+                        <div class="emoji">✅</div>
+                    </div>
+                    <h3 class="cardx-title">My Enrollments</h3>
+                    <p class="cardx-desc">See your courses and current status.</p>
+                    <div class="cardx-cta">Open →</div>
+                </a>
+            </div>
+        }
+
+    </div>
 </div>

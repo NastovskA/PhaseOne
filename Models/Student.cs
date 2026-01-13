@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhaseOne.Models
 {
@@ -34,6 +35,13 @@ namespace PhaseOne.Models
 
         //Dodavanje slika na profil
         public string? ProfileImagePath { get; set; }
+        
+        [Required, EmailAddress] 
+        public string Email { get; set; }
+
+        [NotMapped]
+        [DataType(DataType.Password)]
+        public string Password { get; set; }
 
 
         // Релација: Еден студент може да има повеќе запишувања (Enrollments)

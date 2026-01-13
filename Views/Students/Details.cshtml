@@ -1,81 +1,487 @@
 ﻿@model PhaseOne.Models.Student
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Детали за студент";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Student</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StudentId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StudentId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FirstName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LastName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EnrollmentDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EnrollmentDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AcquiredCredits)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AcquiredCredits)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CurrentSemestar)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CurrentSemestar)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EducationLevel)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EducationLevel)
-        </dd>
-    </dl>
-</div>
-
-<!-- Додадено: Upload форма за профилна слика -->
-<div class="mt-3">
-    <h4>Profile Image</h4>
-
-    <form asp-action="UploadProfileImage" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="id" value="@Model.Id" />
-        <input type="file" name="imageFile" accept="image/*" class="form-control mb-2" />
-        <button type="submit" class="btn btn-primary">Upload Image</button>
-    </form>
-
-    @if (!string.IsNullOrEmpty(Model.ProfileImagePath))
-    {
-        <div class="mt-2">
-            <img src="@Model.ProfileImagePath" alt="Profile Image" class="img-thumbnail" style="max-width:150px;" />
-        </div>
+<style>
+    .details-container {
+        max-width: 1000px;
+        margin: 20px auto;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
     }
-</div>
 
+    .details-header {
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        color: white;
+        padding: 25px 30px;
+        margin-bottom: 0;
+    }
 
+    .details-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
 
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    .details-subtitle {
+        color: #ecf0f1;
+        font-size: 1rem;
+        margin-top: 5px;
+        font-weight: 400;
+    }
+
+    .content-wrapper {
+        padding: 30px;
+    }
+
+    .profile-section {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+
+    .profile-image-container {
+        text-align: center;
+    }
+
+    .profile-image {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #f0f0f0;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        background-color: #ecf0f1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: #7f8c8d;
+    }
+
+    .profile-placeholder {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3498db, #2c3e50);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 4rem;
+        font-weight: bold;
+        border: 5px solid #f0f0f0;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+    }
+
+    .info-section {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 25px;
+        border: 1px solid #e9ecef;
+    }
+
+    .section-title {
+        color: #2c3e50;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #3498db;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .info-row {
+        display: flex;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+        .info-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+    .info-label {
+        width: 160px;
+        font-weight: 500;
+        color: #495057;
+        font-size: 0.95rem;
+    }
+
+    .info-value {
+        flex: 1;
+        color: #2c3e50;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .value-badge {
+        background-color: #3498db;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        display: inline-block;
+    }
+
+    .value-highlight {
+        background-color: #2ecc71;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: inline-block;
+    }
+
+    .upload-section {
+        background-color: #fff8e1;
+        border-radius: 10px;
+        padding: 25px;
+        margin-top: 30px;
+        border: 2px dashed #f1c40f;
+    }
+
+    .upload-title {
+        color: #d35400;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .upload-form {
+        display: flex;
+        gap: 15px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .file-input-container {
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .file-input {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        background-color: white;
+        font-size: 0.9rem;
+    }
+
+        .file-input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+    .action-buttons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 30px;
+        padding-top: 25px;
+        border-top: 2px solid #f0f0f0;
+    }
+
+    .btn {
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2980b9, #1c6394);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(52, 152, 219, 0.2);
+            color: white;
+            text-decoration: none;
+        }
+
+    .btn-secondary {
+        background-color: #95a5a6;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(149, 165, 166, 0.2);
+            color: white;
+            text-decoration: none;
+        }
+
+    .btn-success {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        color: white;
+        padding: 10px 25px;
+        font-size: 0.9rem;
+    }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #27ae60, #219653);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.2);
+            color: white;
+            text-decoration: none;
+        }
+
+    .icon {
+        display: inline-block;
+        width: 20px;
+        text-align: center;
+    }
+
+    .image-preview {
+        text-align: center;
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+
+    .current-image {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid white;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .image-info {
+        margin-top: 10px;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    @@media (max-width: 768px) {
+        .details-container {
+            margin: 10px;
+            border-radius: 8px;
+        }
+
+        .content-wrapper {
+            padding: 20px;
+        }
+
+        .profile-section {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .profile-image-container {
+            order: -1;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .upload-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="details-container">
+    <div class="details-header">
+        <h1 class="details-title">
+            <span class="icon">📋</span>
+            Детали за студент
+        </h1>
+        <div class="details-subtitle">
+            Комплетни информации за студентот
+        </div>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="profile-section">
+            <div class="profile-image-container">
+                @if (!string.IsNullOrEmpty(Model.ProfileImagePath))
+                {
+                    <img src="@Model.ProfileImagePath" alt="Profile Image" class="current-image" />
+                    <div class="image-info">Профилна слика</div>
+                }
+                else
+                {
+                    <div class="profile-placeholder">
+                        @Model.FirstName?[0]@Model.LastName?[0]
+                    </div>
+                    <div class="image-info">Нема поставено слика</div>
+                }
+            </div>
+
+            <div class="student-overview">
+                <h3 style="color: #2c3e50; margin-bottom: 10px;">
+                    @Model.FirstName @Model.LastName
+                </h3>
+                <p style="color: #7f8c8d; margin-bottom: 15px;">
+                    <span class="value-badge">@Model.StudentId</span>
+                </p>
+                <p style="color: #666; font-size: 0.95rem;">
+                    Студент на ниво: <strong>@Model.EducationLevel</strong>
+                </p>
+                <p style="color: #666; font-size: 0.95rem;">
+                    Уписан на: <strong>@Model.EnrollmentDate?.ToString("dd.MM.yyyy")</strong>
+                </p>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-section">
+                <div class="section-title">
+                    <span class="icon">👤</span>
+                    Лични информации
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Индекс:</div>
+                    <div class="info-value">
+                        <span class="value-badge">@Html.DisplayFor(model => model.StudentId)</span>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Име:</div>
+                    <div class="info-value">@Html.DisplayFor(model => model.FirstName)</div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Презиме:</div>
+                    <div class="info-value">@Html.DisplayFor(model => model.LastName)</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="section-title">
+                    <span class="icon">📚</span>
+                    Академски податоци
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Датум на упис:</div>
+                    <div class="info-value">@Html.DisplayFor(model => model.EnrollmentDate)</div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Освоени кредити:</div>
+                    <div class="info-value">
+                        <span class="value-highlight">@Html.DisplayFor(model => model.AcquiredCredits)</span>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Тековен семестар:</div>
+                    <div class="info-value">
+                        <span class="value-highlight">@Html.DisplayFor(model => model.CurrentSemestar)</span>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Степен на образование:</div>
+                    <div class="info-value">@Html.DisplayFor(model => model.EducationLevel)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="upload-section">
+            <div class="upload-title">
+                <span class="icon">📷</span>
+                Управување со профилна слика
+            </div>
+
+            <form asp-action="UploadProfileImage" method="post" enctype="multipart/form-data" class="upload-form">
+                <input type="hidden" name="id" value="@Model.Id" />
+
+                <div class="file-input-container">
+                    <input type="file" name="imageFile" accept="image/*" class="file-input"
+                           title="Изберете профилна слика" />
+                    <small style="color: #666; margin-top: 5px; display: block;">
+                        Дозволени формати: JPG, PNG, GIF (макс. 5MB)
+                    </small>
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    <span class="icon">⬆️</span>
+                    Прикачи слика
+                </button>
+            </form>
+
+            @if (!string.IsNullOrEmpty(Model.ProfileImagePath))
+            {
+                <div class="image-preview">
+                    <p style="font-weight: 500; color: #2c3e50; margin-bottom: 10px;">
+                        Тековна профилна слика:
+                    </p>
+                    <img src="@Model.ProfileImagePath" alt="Profile Image" class="current-image" />
+                    <div class="image-info">
+                        Патека: @Model.ProfileImagePath
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="action-buttons">
+            <a asp-action="Index" class="btn btn-secondary">
+                <span class="icon">←</span>
+                Назад кон листата
+            </a>
+
+            <div style="display: flex; gap: 10px;">
+                <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">
+                    <span class="icon">✏️</span>
+                    Промени податоци
+                </a>
+            </div>
+        </div>
+    </div>
 </div>

@@ -22,176 +22,212 @@ namespace PhaseOne.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Enrollment", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("AdditionalPoints")
-                        .HasColumnType("int");
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ExamPoints")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("FinishDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("Grade")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ProjectPoints")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProjectUrl")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Semester")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<int?>("SeminalPoints")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SeminalUrl")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<long>("StudentId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int?>("Year")
-                        .IsRequired()
-                        .HasColumnType("int");
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudentId");
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.HasIndex("CourseId", "StudentId")
-                        .IsUnique();
+                    b.ToTable("AspNetRoles", (string)null);
+                });
 
-                    b.ToTable("Enrollments");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            AdditionalPoints = 5,
-                            CourseId = 1,
-                            ExamPoints = 50,
-                            FinishDate = new DateTime(2023, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Grade = 10,
-                            ProjectPoints = 20,
-                            ProjectUrl = "http://example.com/project1",
-                            Semester = "winter",
-                            SeminalPoints = 20,
-                            SeminalUrl = "http://example.com/seminal1",
-                            StudentId = 1L,
-                            Year = 2022
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            AdditionalPoints = 0,
-                            CourseId = 2,
-                            ExamPoints = 45,
-                            FinishDate = new DateTime(2024, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Grade = 9,
-                            ProjectPoints = 25,
-                            ProjectUrl = "http://example.com/project2",
-                            Semester = "winter",
-                            SeminalPoints = 15,
-                            SeminalUrl = "http://example.com/seminal2",
-                            StudentId = 2L,
-                            Year = 2023
-                        },
-                        new
-                        {
-                            Id = 3L,
-                            AdditionalPoints = 0,
-                            CourseId = 3,
-                            ExamPoints = 40,
-                            FinishDate = new DateTime(2024, 6, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Grade = 8,
-                            ProjectPoints = 20,
-                            ProjectUrl = "http://example.com/project3",
-                            Semester = "summer",
-                            SeminalPoints = 20,
-                            SeminalUrl = "http://example.com/seminal3",
-                            StudentId = 3L,
-                            Year = 2023
-                        },
-                        new
-                        {
-                            Id = 4L,
-                            AdditionalPoints = 5,
-                            CourseId = 4,
-                            ExamPoints = 35,
-                            FinishDate = new DateTime(2022, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Grade = 7,
-                            ProjectPoints = 15,
-                            ProjectUrl = "http://example.com/project4",
-                            Semester = "summer",
-                            SeminalPoints = 15,
-                            SeminalUrl = "http://example.com/seminal4",
-                            StudentId = 4L,
-                            Year = 2021
-                        },
-                        new
-                        {
-                            Id = 5L,
-                            AdditionalPoints = 10,
-                            CourseId = 5,
-                            ExamPoints = 50,
-                            FinishDate = new DateTime(2023, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Grade = 10,
-                            ProjectPoints = 20,
-                            ProjectUrl = "http://example.com/project5",
-                            Semester = "winter",
-                            SeminalPoints = 20,
-                            SeminalUrl = "http://example.com/seminal5",
-                            StudentId = 5L,
-                            Year = 2022
-                        },
-                        new
-                        {
-                            Id = 6L,
-                            AdditionalPoints = 5,
-                            CourseId = 6,
-                            ExamPoints = 45,
-                            FinishDate = new DateTime(2024, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Grade = 9,
-                            ProjectPoints = 25,
-                            ProjectUrl = "http://example.com/project6",
-                            Semester = "summer",
-                            SeminalPoints = 15,
-                            SeminalUrl = "http://example.com/seminal6",
-                            StudentId = 6L,
-                            Year = 2023
-                        },
-                        new
-                        {
-                            Id = 7L,
-                            AdditionalPoints = 0,
-                            CourseId = 7,
-                            ExamPoints = 40,
-                            FinishDate = new DateTime(2025, 6, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Grade = 8,
-                            ProjectPoints = 20,
-                            ProjectUrl = "http://example.com/project7",
-                            Semester = "winter",
-                            SeminalPoints = 20,
-                            SeminalUrl = "http://example.com/seminal7",
-                            StudentId = 7L,
-                            Year = 2024
-                        });
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LoginProvider")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("PhaseOne.Models.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("StudentIdRef")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("TeacherId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("PhaseOne.Models.Course", b =>
@@ -315,6 +351,181 @@ namespace PhaseOne.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PhaseOne.Models.Enrollment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int?>("AdditionalPoints")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ExamPoints")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("FinishDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("Grade")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProjectPoints")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProjectUrl")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Semester")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<int?>("SeminalPoints")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SeminalUrl")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<long>("StudentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.HasIndex("CourseId", "StudentId")
+                        .IsUnique();
+
+                    b.HasIndex("CourseId", "StudentId", "Year", "Semester")
+                        .IsUnique();
+
+                    b.ToTable("Enrollments");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            AdditionalPoints = 5,
+                            CourseId = 1,
+                            ExamPoints = 50,
+                            FinishDate = new DateTime(2023, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Grade = 10,
+                            ProjectPoints = 20,
+                            ProjectUrl = "http://example.com/project1",
+                            Semester = "winter",
+                            SeminalPoints = 20,
+                            SeminalUrl = "http://example.com/seminal1",
+                            StudentId = 1L,
+                            Year = 2022
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            AdditionalPoints = 0,
+                            CourseId = 2,
+                            ExamPoints = 45,
+                            FinishDate = new DateTime(2024, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Grade = 9,
+                            ProjectPoints = 25,
+                            ProjectUrl = "http://example.com/project2",
+                            Semester = "winter",
+                            SeminalPoints = 15,
+                            SeminalUrl = "http://example.com/seminal2",
+                            StudentId = 2L,
+                            Year = 2023
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            AdditionalPoints = 0,
+                            CourseId = 3,
+                            ExamPoints = 40,
+                            FinishDate = new DateTime(2024, 6, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Grade = 8,
+                            ProjectPoints = 20,
+                            ProjectUrl = "http://example.com/project3",
+                            Semester = "summer",
+                            SeminalPoints = 20,
+                            SeminalUrl = "http://example.com/seminal3",
+                            StudentId = 3L,
+                            Year = 2023
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            AdditionalPoints = 5,
+                            CourseId = 4,
+                            ExamPoints = 35,
+                            FinishDate = new DateTime(2022, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Grade = 7,
+                            ProjectPoints = 15,
+                            ProjectUrl = "http://example.com/project4",
+                            Semester = "summer",
+                            SeminalPoints = 15,
+                            SeminalUrl = "http://example.com/seminal4",
+                            StudentId = 4L,
+                            Year = 2021
+                        },
+                        new
+                        {
+                            Id = 5L,
+                            AdditionalPoints = 10,
+                            CourseId = 5,
+                            ExamPoints = 50,
+                            FinishDate = new DateTime(2023, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Grade = 10,
+                            ProjectPoints = 20,
+                            ProjectUrl = "http://example.com/project5",
+                            Semester = "winter",
+                            SeminalPoints = 20,
+                            SeminalUrl = "http://example.com/seminal5",
+                            StudentId = 5L,
+                            Year = 2022
+                        },
+                        new
+                        {
+                            Id = 6L,
+                            AdditionalPoints = 5,
+                            CourseId = 6,
+                            ExamPoints = 45,
+                            FinishDate = new DateTime(2024, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Grade = 9,
+                            ProjectPoints = 25,
+                            ProjectUrl = "http://example.com/project6",
+                            Semester = "summer",
+                            SeminalPoints = 15,
+                            SeminalUrl = "http://example.com/seminal6",
+                            StudentId = 6L,
+                            Year = 2023
+                        },
+                        new
+                        {
+                            Id = 7L,
+                            AdditionalPoints = 0,
+                            CourseId = 7,
+                            ExamPoints = 40,
+                            FinishDate = new DateTime(2025, 6, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Grade = 8,
+                            ProjectPoints = 20,
+                            ProjectUrl = "http://example.com/project7",
+                            Semester = "winter",
+                            SeminalPoints = 20,
+                            SeminalUrl = "http://example.com/seminal7",
+                            StudentId = 7L,
+                            Year = 2024
+                        });
+                });
+
             modelBuilder.Entity("PhaseOne.Models.SeminarWork", b =>
                 {
                     b.Property<int>("Id")
@@ -363,6 +574,10 @@ namespace PhaseOne.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("EnrollmentDate")
                         .HasColumnType("datetime2");
 
@@ -398,6 +613,7 @@ namespace PhaseOne.Migrations
                             AcquiredCredits = 60,
                             CurrentSemestar = 3,
                             EducationLevel = "Bachelor",
+                            Email = "elena.kostova@feit.ukim.edu.mk",
                             EnrollmentDate = new DateTime(2022, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "Elena",
                             LastName = "Kostova",
@@ -409,6 +625,7 @@ namespace PhaseOne.Migrations
                             AcquiredCredits = 120,
                             CurrentSemestar = 5,
                             EducationLevel = "Bachelor",
+                            Email = "ivan.nikolov@feit.ukim.edu.mk",
                             EnrollmentDate = new DateTime(2021, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "Ivan",
                             LastName = "Nikolov",
@@ -420,6 +637,7 @@ namespace PhaseOne.Migrations
                             AcquiredCredits = 30,
                             CurrentSemestar = 2,
                             EducationLevel = "Bachelor",
+                            Email = "marija.stojanova@feit.ukim.edu.mk",
                             EnrollmentDate = new DateTime(2023, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "Marija",
                             LastName = "Stojanova",
@@ -431,6 +649,7 @@ namespace PhaseOne.Migrations
                             AcquiredCredits = 180,
                             CurrentSemestar = 7,
                             EducationLevel = "Bachelor",
+                            Email = "petar.iliev@feit.ukim.edu.mk",
                             EnrollmentDate = new DateTime(2020, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "Petar",
                             LastName = "Iliev",
@@ -442,6 +661,7 @@ namespace PhaseOne.Migrations
                             AcquiredCredits = 90,
                             CurrentSemestar = 4,
                             EducationLevel = "Bachelor",
+                            Email = "simona.georgieva@feit.ukim.edu.mk",
                             EnrollmentDate = new DateTime(2022, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "Simona",
                             LastName = "Georgieva",
@@ -453,6 +673,7 @@ namespace PhaseOne.Migrations
                             AcquiredCredits = 150,
                             CurrentSemestar = 6,
                             EducationLevel = "Bachelor",
+                            Email = "aleksandar.trajkovski@feit.ukim.edu.mk",
                             EnrollmentDate = new DateTime(2021, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "Aleksandar",
                             LastName = "Trajkovski",
@@ -464,6 +685,7 @@ namespace PhaseOne.Migrations
                             AcquiredCredits = 15,
                             CurrentSemestar = 1,
                             EducationLevel = "Bachelor",
+                            Email = "sara.mitreva@feit.ukim.edu.mk",
                             EnrollmentDate = new DateTime(2023, 10, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FirstName = "Sara",
                             LastName = "Mitreva",
@@ -471,7 +693,7 @@ namespace PhaseOne.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Teacher", b =>
+            modelBuilder.Entity("PhaseOne.Models.Teacher", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -486,6 +708,10 @@ namespace PhaseOne.Migrations
                     b.Property<string>("Degree")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -517,6 +743,7 @@ namespace PhaseOne.Migrations
                             Id = 1,
                             AcademicRank = "Professor",
                             Degree = "PhD",
+                            Email = "lila.petrova@feit.ukim.edu.mk",
                             FirstName = "Lila",
                             HireDate = new DateTime(2015, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Petrova",
@@ -527,6 +754,7 @@ namespace PhaseOne.Migrations
                             Id = 2,
                             AcademicRank = "Assistant",
                             Degree = "MSc",
+                            Email = "marko.stojanovski@feit.ukim.edu.mk",
                             FirstName = "Marko",
                             HireDate = new DateTime(2018, 2, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Stojanovski",
@@ -537,6 +765,7 @@ namespace PhaseOne.Migrations
                             Id = 3,
                             AcademicRank = "Associate Professor",
                             Degree = "PhD",
+                            Email = "ivana.koleva@feit.ukim.edu.mk",
                             FirstName = "Ivana",
                             HireDate = new DateTime(2016, 5, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Koleva",
@@ -547,6 +776,7 @@ namespace PhaseOne.Migrations
                             Id = 4,
                             AcademicRank = "Assistant",
                             Degree = "MSc",
+                            Email = "stefan.jovanov@feit.ukim.edu.mk",
                             FirstName = "Stefan",
                             HireDate = new DateTime(2019, 1, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Jovanov",
@@ -557,6 +787,7 @@ namespace PhaseOne.Migrations
                             Id = 5,
                             AcademicRank = "Professor",
                             Degree = "PhD",
+                            Email = "biljana.ristova@feit.ukim.edu.mk",
                             FirstName = "Biljana",
                             HireDate = new DateTime(2014, 11, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Ristova",
@@ -567,6 +798,7 @@ namespace PhaseOne.Migrations
                             Id = 6,
                             AcademicRank = "Assistant",
                             Degree = "MSc",
+                            Email = "miki.todorov@feit.ukim.edu.mk",
                             FirstName = "Miki",
                             HireDate = new DateTime(2020, 3, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Todorov",
@@ -577,6 +809,7 @@ namespace PhaseOne.Migrations
                             Id = 7,
                             AcademicRank = "Associate Professor",
                             Degree = "PhD",
+                            Email = "dragana.spasova@feit.ukim.edu.mk",
                             FirstName = "Dragana",
                             HireDate = new DateTime(2017, 7, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Spasova",
@@ -584,7 +817,75 @@ namespace PhaseOne.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Enrollment", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("PhaseOne.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("PhaseOne.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PhaseOne.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("PhaseOne.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PhaseOne.Models.Course", b =>
+                {
+                    b.HasOne("PhaseOne.Models.Teacher", "FirstTeacher")
+                        .WithMany("FirstTeacherCourses")
+                        .HasForeignKey("FirstTeacherId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PhaseOne.Models.Teacher", "SecondTeacher")
+                        .WithMany("SecondTeacherCourses")
+                        .HasForeignKey("SecondTeacherId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("FirstTeacher");
+
+                    b.Navigation("SecondTeacher");
+                });
+
+            modelBuilder.Entity("PhaseOne.Models.Enrollment", b =>
                 {
                     b.HasOne("PhaseOne.Models.Course", "Course")
                         .WithMany("Enrollments")
@@ -601,23 +902,6 @@ namespace PhaseOne.Migrations
                     b.Navigation("Course");
 
                     b.Navigation("Student");
-                });
-
-            modelBuilder.Entity("PhaseOne.Models.Course", b =>
-                {
-                    b.HasOne("Teacher", "FirstTeacher")
-                        .WithMany("FirstTeacherCourses")
-                        .HasForeignKey("FirstTeacherId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Teacher", "SecondTeacher")
-                        .WithMany("SecondTeacherCourses")
-                        .HasForeignKey("SecondTeacherId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("FirstTeacher");
-
-                    b.Navigation("SecondTeacher");
                 });
 
             modelBuilder.Entity("PhaseOne.Models.SeminarWork", b =>
@@ -649,7 +933,7 @@ namespace PhaseOne.Migrations
                     b.Navigation("Enrollments");
                 });
 
-            modelBuilder.Entity("Teacher", b =>
+            modelBuilder.Entity("PhaseOne.Models.Teacher", b =>
                 {
                     b.Navigation("FirstTeacherCourses");
 

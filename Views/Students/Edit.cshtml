@@ -1,64 +1,364 @@
 ﻿@model PhaseOne.Models.Student
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Промени студент";
 }
 
-<h1>Edit</h1>
+<style>
+    .edit-container {
+        max-width: 1000px;
+        margin: 20px auto;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
 
-<h4>Student</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+    .edit-header {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        padding: 25px 30px;
+        margin-bottom: 0;
+    }
+
+    .edit-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .edit-subtitle {
+        color: #ecf0f1;
+        font-size: 1rem;
+        margin-top: 5px;
+        font-weight: 400;
+    }
+
+    .form-wrapper {
+        padding: 30px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .form-section {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 25px;
+        border: 1px solid #e9ecef;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .form-section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+        }
+
+    .section-title {
+        color: #2c3e50;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #3498db;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .section-title i {
+            color: #3498db;
+        }
+
+    .form-group {
+        margin-bottom: 22px;
+    }
+
+        .form-group label {
+            display: block;
+            color: #495057;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        background-color: #fff;
+    }
+
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            outline: none;
+        }
+
+        .form-control.input-highlight {
+            background-color: #fff9e6;
+            border-color: #f1c40f;
+        }
+
+    .field-info {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .text-danger {
+        color: #e74c3c;
+        font-size: 0.85rem;
+        margin-top: 6px;
+        display: block;
+        padding-left: 5px;
+    }
+
+    .validation-summary {
+        background-color: #ffeaa7;
+        border-left: 4px solid #f1c40f;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 25px;
+    }
+
+        .validation-summary ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        padding-top: 25px;
+        border-top: 2px solid #f0f0f0;
+    }
+
+    .btn {
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2980b9, #1c6394);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(52, 152, 219, 0.2);
+            color: white;
+            text-decoration: none;
+        }
+
+    .btn-secondary {
+        background-color: #95a5a6;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(149, 165, 166, 0.2);
+            color: white;
+            text-decoration: none;
+        }
+
+    .back-link {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+        .back-link a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+            .back-link a:hover {
+                background-color: #f8f9fa;
+                color: #2980b9;
+                text-decoration: none;
+            }
+
+    @@media (max-width: 768px) {
+        .edit-container {
+            margin: 10px;
+            border-radius: 8px;
+        }
+
+        .form-wrapper {
+            padding: 20px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+
+    .icon {
+        display: inline-block;
+        width: 20px;
+        text-align: center;
+    }
+</style>
+
+<div class="edit-container">
+    <div class="edit-header">
+        <h1 class="edit-title">
+            <span class="icon">✏️</span>
+            Промени студент
+        </h1>
+        <div class="edit-subtitle">
+            Ажурирајте ги информациите за студентот
+        </div>
+    </div>
+
+    <div class="form-wrapper">
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
         <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="StudentId" class="control-label"></label>
-                <input asp-for="StudentId" class="form-control" />
-                <span asp-validation-for="StudentId" class="text-danger"></span>
+
+            <div class="form-grid">
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="icon">👤</span>
+                        Основни информации
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="StudentId"></label>
+                        <input asp-for="StudentId" class="form-control" />
+                        <span asp-validation-for="StudentId" class="text-danger"></span>
+                        <div class="field-info">Уникатен идентификационен број на студентот</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="FirstName"></label>
+                        <input asp-for="FirstName" class="form-control" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="LastName"></label>
+                        <input asp-for="LastName" class="form-control" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="icon">📚</span>
+                        Академски податоци
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="EnrollmentDate"></label>
+                        <input asp-for="EnrollmentDate" class="form-control" />
+                        <span asp-validation-for="EnrollmentDate" class="text-danger"></span>
+                        <div class="field-info">Датум на упис на студентот</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="AcquiredCredits"></label>
+                        <input asp-for="AcquiredCredits" class="form-control input-highlight" />
+                        <span asp-validation-for="AcquiredCredits" class="text-danger"></span>
+                        <div class="field-info">Вкупно освоени кредити</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CurrentSemestar"></label>
+                        <input asp-for="CurrentSemestar" class="form-control input-highlight" />
+                        <span asp-validation-for="CurrentSemestar" class="text-danger"></span>
+                        <div class="field-info">Тековен семестар на студии</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="EducationLevel"></label>
+                        <input asp-for="EducationLevel" class="form-control" />
+                        <span asp-validation-for="EducationLevel" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LastName" class="control-label"></label>
-                <input asp-for="LastName" class="form-control" />
-                <span asp-validation-for="LastName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EnrollmentDate" class="control-label"></label>
-                <input asp-for="EnrollmentDate" class="form-control" />
-                <span asp-validation-for="EnrollmentDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="AcquiredCredits" class="control-label"></label>
-                <input asp-for="AcquiredCredits" class="form-control" />
-                <span asp-validation-for="AcquiredCredits" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CurrentSemestar" class="control-label"></label>
-                <input asp-for="CurrentSemestar" class="form-control" />
-                <span asp-validation-for="CurrentSemestar" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EducationLevel" class="control-label"></label>
-                <input asp-for="EducationLevel" class="form-control" />
-                <span asp-validation-for="EducationLevel" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+
+            <div class="action-buttons">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <span class="icon">←</span>
+                    Назад кон листата
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <span class="icon">💾</span>
+                    Зачувај промени
+                </button>
             </div>
         </form>
+
+        <div class="back-link">
+            <a asp-action="Index">
+                <span class="icon">↶</span>
+                Назад кон листата на студенти
+            </a>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // Highlight required fields
+            $('input[required]').addClass('input-highlight');
+
+            // Add focus effects
+            $('.form-control').focus(function() {
+                $(this).parent().addClass('focused');
+            }).blur(function() {
+                $(this).parent().removeClass('focused');
+            });
+        });
+    </script>
 }

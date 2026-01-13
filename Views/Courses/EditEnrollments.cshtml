@@ -1,20 +1,1138 @@
 ﻿@model CourseEnrollmentViewModel
 
-<form asp-action="UpdateEnrollments">
-    <input type="hidden" name="CourseId" value="@Model.CourseId" />
-    <table class="table">
-        <thead><tr><th>Студент</th><th>Запишан</th></tr></thead>
-        <tbody>
-            @foreach (var student in Model.Students)
-            {
-                <tr>
-                    <td>@student.FullName</td>
-                    <td>
-                        <input type="checkbox" name="SelectedStudentIds" value="@student.StudentId" @(student.IsEnrolled ? "checked" : "") />
-                    </td>
-                </tr>
+@{
+    // Создаваме помошен модел за деактивирање или ги користиме постоечките податоци
+    var deactivateModel = ViewBag.DeactivateModel as AdminDeactivateEnrollmentsViewModel;
+    var hasDeactivateData = deactivateModel != null;
+    var selectedYear = ViewBag.SelectedYear ?? Model.Year;
+    var selectedSemester = ViewBag.SelectedSemester ?? Model.Semester;
+}
+
+<style>
+    :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #3498db;
+        --accent-color: #2980b9;
+        --success-color: #27ae60;
+        --warning-color: #f39c12;
+        --danger-color: #e74c3c;
+        --light-bg: #f8f9fa;
+        --card-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+        --hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 13px;
+    }
+
+    .enrollment-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 15px;
+    }
+
+    /* HEADER */
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+        color: white;
+        padding: 18px 22px;
+        border-radius: 10px;
+        margin-bottom: 22px;
+        box-shadow: var(--card-shadow);
+    }
+
+        .page-header h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .page-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+    /* FORM CARD */
+    .form-card {
+        background: white;
+        border-radius: 10px;
+        padding: 22px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 25px;
+    }
+
+    .form-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .form-icon {
+        background: var(--secondary-color);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .form-title {
+        color: var(--primary-color);
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    /* FILTER SECTION */
+    .filter-section {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border: 1px solid #e9ecef;
+    }
+
+    .filter-title {
+        color: var(--primary-color);
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filter-group {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+
+    .filter-item {
+        display: flex;
+        flex-direction: column;
+        min-width: 150px;
+    }
+
+    .filter-label {
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    .filter-input {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+    .filter-select {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+    .filter-button {
+        padding: 8px 20px;
+        background: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .filter-button:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+    /* TABLE STYLES */
+    .table-container {
+        overflow-x: auto;
+        border-radius: 8px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 25px;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+        .table thead {
+            background: var(--primary-color);
+        }
+
+            .table thead th {
+                color: white;
+                font-weight: 600;
+                padding: 14px 16px;
+                text-align: left;
+                font-size: 0.85rem;
             }
-        </tbody>
-    </table>
-    <button type="submit" class="btn btn-primary">Зачувај</button>
-</form>
+
+                .table thead th:first-child {
+                    border-top-left-radius: 8px;
+                }
+
+                .table thead th:last-child {
+                    border-top-right-radius: 8px;
+                }
+
+        .table tbody tr {
+            border-bottom: 1px solid #eee;
+            transition: all 0.2s;
+        }
+
+            .table tbody tr:hover {
+                background-color: rgba(52, 152, 219, 0.05);
+                transform: translateY(-1px);
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+            }
+
+        .table tbody td {
+            padding: 14px 16px;
+            color: #333;
+            vertical-align: middle;
+        }
+
+    .student-name {
+        font-weight: 600;
+        color: var(--primary-color);
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .student-icon {
+        color: var(--secondary-color);
+        font-size: 1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    /* CHECKBOX STYLES */
+    .checkbox-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .custom-checkbox {
+        position: relative;
+        cursor: pointer;
+        width: 22px;
+        height: 22px;
+    }
+
+        .custom-checkbox input[type="checkbox"] {
+            opacity: 0;
+            position: absolute;
+            width: 0;
+            height: 0;
+        }
+
+    .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 22px;
+        height: 22px;
+        background-color: #f8f9fa;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        transition: all 0.2s;
+    }
+
+    .custom-checkbox input[type="checkbox"]:checked ~ .checkmark {
+        background-color: var(--success-color);
+        border-color: var(--success-color);
+    }
+
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+        left: 7px;
+        top: 3px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    .custom-checkbox input[type="checkbox"]:checked ~ .checkmark:after {
+        display: block;
+    }
+
+    .custom-checkbox:hover .checkmark {
+        border-color: var(--secondary-color);
+        transform: scale(1.05);
+    }
+
+    .enrollment-status {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    .enrolled-badge {
+        background-color: #d5f4e6;
+        color: var(--success-color);
+    }
+
+    .not-enrolled-badge {
+        background-color: #ffeaea;
+        color: var(--danger-color);
+    }
+
+    /* DATE PICKER */
+    .date-picker-container {
+        margin: 20px 0;
+        padding: 15px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border-left: 4px solid var(--warning-color);
+    }
+
+    .date-picker-label {
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .date-input {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        width: 200px;
+        transition: all 0.2s;
+    }
+
+        .date-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+    /* BUTTONS */
+    .button-group {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+
+    .btn {
+        padding: 10px 24px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: none;
+    }
+
+    .btn-primary {
+        background: var(--secondary-color);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+            color: white;
+        }
+
+    .btn-secondary {
+        background: #95a5a6;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+            color: white;
+        }
+
+    .btn-danger {
+        background: var(--danger-color);
+        color: white;
+    }
+
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+            color: white;
+        }
+
+    .btn-warning {
+        background: var(--warning-color);
+        color: white;
+    }
+
+        .btn-warning:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+            color: white;
+        }
+
+    /* TABS */
+    .tab-container {
+        margin-bottom: 25px;
+    }
+
+    .tab-buttons {
+        display: flex;
+        gap: 5px;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .tab-button {
+        padding: 12px 24px;
+        background: none;
+        border: none;
+        font-weight: 600;
+        color: #666;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+    }
+
+        .tab-button:hover {
+            color: var(--secondary-color);
+        }
+
+        .tab-button.active {
+            color: var(--secondary-color);
+            border-bottom-color: var(--secondary-color);
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+    .tab-content {
+        display: none;
+    }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+    /* STATS */
+    .stats-container {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .stat-box {
+        background: white;
+        border-radius: 8px;
+        padding: 12px 18px;
+        box-shadow: var(--card-shadow);
+        border-left: 4px solid var(--secondary-color);
+        min-width: 150px;
+    }
+
+    .stat-box-warning {
+        border-left-color: var(--warning-color);
+    }
+
+    .stat-box-danger {
+        border-left-color: var(--danger-color);
+    }
+
+    .stat-value {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* NO DATA */
+    .no-data {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+
+    .no-data-icon {
+        font-size: 3rem;
+        color: #bdc3c7;
+        margin-bottom: 15px;
+    }
+
+    /* ALERT MESSAGES */
+    .alert-message {
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .alert-success {
+        background-color: #d5f4e6;
+        color: var(--success-color);
+        border-left: 4px solid var(--success-color);
+    }
+
+    .alert-warning {
+        background-color: #fff4e6;
+        color: var(--warning-color);
+        border-left: 4px solid var(--warning-color);
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .enrollment-container {
+            padding: 10px;
+        }
+
+        .page-header {
+            padding: 15px 18px;
+        }
+
+            .page-header h1 {
+                font-size: 1.2rem;
+            }
+
+        .form-card {
+            padding: 18px;
+        }
+
+        .stats-container {
+            justify-content: center;
+        }
+
+        .stat-box {
+            flex: 1;
+            min-width: calc(50% - 15px);
+            text-align: center;
+        }
+
+        .table thead th,
+        .table tbody td {
+            padding: 12px 14px;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .tab-buttons {
+            overflow-x: auto;
+            flex-wrap: nowrap;
+        }
+
+        .tab-button {
+            white-space: nowrap;
+            padding: 10px 15px;
+            font-size: 0.85rem;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .page-header h1 {
+            font-size: 1.1rem;
+        }
+
+        .form-title {
+            font-size: 1.1rem;
+        }
+
+        .student-name {
+            font-size: 0.9rem;
+        }
+
+        .table {
+            font-size: 0.85rem;
+        }
+
+        .filter-group {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-item {
+            width: 100%;
+        }
+    }
+
+    /* ANIMATIONS */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .page-header, .form-card {
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .table tbody tr {
+        animation: fadeIn 0.4s ease-out;
+        animation-fill-mode: both;
+    }
+
+        .table tbody tr:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .table tbody tr:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .table tbody tr:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .table tbody tr:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+
+        .table tbody tr:nth-child(5) {
+            animation-delay: 0.25s;
+        }
+</style>
+
+<div class="enrollment-container">
+    <!-- HEADER -->
+    <div class="page-header">
+        <h1>👥 Менаџирај запишувања - @ViewBag.CourseTitle</h1>
+        <p>Изберете кои студенти се запишани на курсот</p>
+    </div>
+
+    <!-- ALERT MESSAGES -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert-message alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span>@TempData["SuccessMessage"]</span>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert-message alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>@TempData["ErrorMessage"]</span>
+        </div>
+    }
+
+    <!-- TABS -->
+    <div class="tab-container">
+        <div class="tab-buttons">
+            <button type="button" class="tab-button active" data-tab="enroll">Запишување</button>
+            <button type="button" class="tab-button" data-tab="deactivate">Деактивирање</button>
+        </div>
+    </div>
+
+    <!-- ENROLL TAB -->
+    <div id="enroll-tab" class="tab-content active">
+        <!-- STATS -->
+        <div class="stats-container">
+            <div class="stat-box">
+                <span class="stat-value">@Model.Students.Count()</span>
+                <span class="stat-label">Вкупно студенти</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">@Model.Students.Count(s => s.IsEnrolled)</span>
+                <span class="stat-label">Запишани</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">@Model.Students.Count(s => !s.IsEnrolled)</span>
+                <span class="stat-label">Незапишани</span>
+            </div>
+        </div>
+
+        <!-- FILTER SECTION -->
+        <div class="filter-section">
+            <form asp-action="AdminUpdateEnrollments" method="get" class="filter-form">
+                <input type="hidden" name="courseId" value="@Model.CourseId" />
+
+                <h4 class="filter-title">
+                    <i class="fas fa-filter"></i> Филтер
+                </h4>
+
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <label class="filter-label">Академска година</label>
+                        <input type="number"
+                               name="year"
+                               value="@Model.Year"
+                               class="filter-input"
+                               min="2000" />
+                    </div>
+
+                    <div class="filter-item">
+                        <label class="filter-label">Семестар</label>
+                        <select name="semester" class="filter-select">
+                            <option value="Winter" selected="@("Winter" == Model.Semester)">Зимски</option>
+                            <option value="Summer" selected="@("Summer" == Model.Semester)">Летен</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-item">
+                        <button type="submit" class="filter-button">
+                            <i class="fas fa-search"></i> Пребарај
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- FORM CARD -->
+        <div class="form-card">
+            <div class="form-card-header">
+                <div class="form-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h2 class="form-title">Листа на студенти</h2>
+            </div>
+
+            <form asp-action="AdminUpdateEnrollments" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="courseId" value="@Model.CourseId" />
+                <input type="hidden" name="year" value="@Model.Year" />
+                <input type="hidden" name="semester" value="@Model.Semester" />
+
+                @if (Model.Students.Any())
+                {
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 70%;">Студент</th>
+                                    <th style="width: 30%;" class="text-center">Статус на запишување</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var student in Model.Students)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="student-name">
+                                                <i class="fas fa-user-graduate student-icon"></i>
+                                                @student.FullName
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="enrollment-status">
+                                                <label class="custom-checkbox">
+                                                    <input type="checkbox"
+                                                           name="selectedStudentIds"
+                                                           value="@student.StudentId"
+                                                           @(student.IsEnrolled ? "checked" : "") />
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                                <span class="status-badge @(student.IsEnrolled ? "enrolled-badge" : "not-enrolled-badge")">
+                                                    @(student.IsEnrolled ? "Запишан" : "Незапишан")
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Зачувај промени
+                        </button>
+                        <button type="button" class="btn btn-warning" id="selectAllEnroll">
+                            <i class="fas fa-check-square"></i> Избери ги сите
+                        </button>
+                        <a asp-action="Details" asp-route-id="@Model.CourseId" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Назад кон детали
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <div class="no-data-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <h4>Нема достапни студенти</h4>
+                        <p>Не се пронајдени студенти за управување.</p>
+                        <a asp-action="Details" asp-route-id="@Model.CourseId" class="btn btn-secondary mt-3">
+                            <i class="fas fa-arrow-left"></i> Назад кон детали
+                        </a>
+                    </div>
+                }
+            </form>
+        </div>
+    </div>
+
+    <!-- DEACTIVATE TAB -->
+    <div id="deactivate-tab" class="tab-content">
+        <!-- FILTER SECTION FOR DEACTIVATE -->
+        <div class="filter-section">
+            <form asp-action="AdminDeactivateEnrollments" method="get" class="filter-form">
+                <input type="hidden" name="courseId" value="@Model.CourseId" />
+
+                <h4 class="filter-title">
+                    <i class="fas fa-filter"></i> Филтер за деактивирање
+                </h4>
+
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <label class="filter-label">Академска година</label>
+                        <input type="number"
+                               name="year"
+                               value="@selectedYear"
+                               class="filter-input"
+                               min="2000" />
+                    </div>
+
+                    <div class="filter-item">
+                        <label class="filter-label">Семестар</label>
+                        <select name="semester" class="filter-select">
+                            <option value="Winter" selected="@("Winter" == selectedSemester)">Зимски</option>
+                            <option value="Summer" selected="@("Summer" == selectedSemester)">Летен</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-item">
+                        <button type="submit" class="filter-button">
+                            <i class="fas fa-search"></i> Вчитување на запишувања
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- SELECTED FILTER INFO -->
+        @if (hasDeactivateData)
+        {
+            <div class="stat-box stat-box-warning">
+                <span class="stat-value">@deactivateModel.Year / @deactivateModel.Semester</span>
+                <span class="stat-label">Избрани: година / семестар</span>
+            </div>
+
+            <!-- DEACTIVATE FORM -->
+            <div class="form-card">
+                <div class="form-card-header">
+                    <div class="form-icon" style="background: var(--danger-color);">
+                        <i class="fas fa-user-slash"></i>
+                    </div>
+                    <h2 class="form-title">Деактивирање на запишувања</h2>
+                </div>
+
+                <form asp-action="AdminDeactivateEnrollments" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="CourseId" value="@deactivateModel.CourseId" />
+                    <input type="hidden" name="Year" value="@deactivateModel.Year" />
+                    <input type="hidden" name="Semester" value="@deactivateModel.Semester" />
+
+                    <!-- DATE PICKER -->
+                    <div class="date-picker-container">
+                        <label class="date-picker-label">Датум на деактивирање</label>
+                        <input type="date"
+                               name="FinishDate"
+                               class="date-input"
+                               value="@DateTime.Now.ToString("yyyy-MM-dd")"
+                               required />
+                    </div>
+
+                    <h4>Активни запишувања</h4>
+
+                    @if (deactivateModel.Enrollments == null || deactivateModel.Enrollments.Count == 0)
+                    {
+                        <div class="no-data">
+                            <div class="no-data-icon">
+                                <i class="fas fa-user-times"></i>
+                            </div>
+                            <h4>Нема активни студенти</h4>
+                            <p>Не се пронајдени активни запишувања за избраната година и семестар.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80%;">Студент</th>
+                                        <th style="width: 20%;" class="text-center">Деактивирај</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var enrollment in deactivateModel.Enrollments)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="student-name">
+                                                    <i class="fas fa-user student-icon"></i>
+                                                    @enrollment.StudentDisplay
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="checkbox-container">
+                                                    <label class="custom-checkbox">
+                                                        <input type="checkbox"
+                                                               name="SelectedEnrollmentIds"
+                                                               value="@enrollment.EnrollmentId" />
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-ban"></i> Деактивирај избрани
+                            </button>
+                            <button type="button" class="btn btn-warning" id="selectAllDeactivate">
+                                <i class="fas fa-check-square"></i> Избери ги сите
+                            </button>
+                            <a asp-action="Details" asp-route-id="@Model.CourseId" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Назад кон детали
+                            </a>
+                        </div>
+                    }
+                </form>
+            </div>
+        }
+        else
+        {
+            <div class="form-card">
+                <div class="form-card-header">
+                    <div class="form-icon" style="background: var(--warning-color);">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h2 class="form-title">Деактивирање на запишувања</h2>
+                </div>
+
+                <div class="no-data">
+                    <div class="no-data-icon">
+                        <i class="fas fa-filter"></i>
+                    </div>
+                    <h4>Изберете филтер</h4>
+                    <p>Внесете година и семестар за да ги видите активните запишувања.</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <!-- FontAwesome за икони -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+
+                    // Remove active class from all buttons and contents
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    // Add active class to clicked button and corresponding content
+                    this.classList.add('active');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+
+            // Checkbox interactions for enroll tab
+            const enrollCheckboxes = document.querySelectorAll('#enroll-tab .custom-checkbox');
+            enrollCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('click', function() {
+                    const badge = this.parentElement.querySelector('.status-badge');
+                    const input = this.querySelector('input');
+                    const isChecked = input.checked;
+
+                    // Toggle badge text with animation
+                    badge.style.opacity = '0';
+                    badge.style.transform = 'scale(0.9)';
+                    setTimeout(() => {
+                        badge.textContent = isChecked ? 'Запишан' : 'Незапишан';
+                        badge.className = 'status-badge ' + (isChecked ? 'enrolled-badge' : 'not-enrolled-badge');
+                        badge.style.opacity = '1';
+                        badge.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+
+            // Select all for enroll tab
+            const selectAllEnrollBtn = document.getElementById('selectAllEnroll');
+            if (selectAllEnrollBtn) {
+                selectAllEnrollBtn.addEventListener('click', function() {
+                    const checkboxes = document.querySelectorAll('#enroll-tab input[type="checkbox"]');
+                    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+
+                    checkboxes.forEach(cb => {
+                        cb.checked = !allChecked;
+                        cb.dispatchEvent(new Event('change'));
+                    });
+
+                    this.innerHTML = allChecked
+                        ? '<i class="fas fa-check-square"></i> Избери ги сите'
+                        : '<i class="fas fa-times-circle"></i> Откажи ги сите';
+                });
+            }
+
+            // Select all for deactivate tab
+            const selectAllDeactivateBtn = document.getElementById('selectAllDeactivate');
+            if (selectAllDeactivateBtn) {
+                selectAllDeactivateBtn.addEventListener('click', function() {
+                    const checkboxes = document.querySelectorAll('#deactivate-tab input[name="SelectedEnrollmentIds"]');
+                    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+
+                    checkboxes.forEach(cb => {
+                        cb.checked = !allChecked;
+                    });
+
+                    this.innerHTML = allChecked
+                        ? '<i class="fas fa-check-square"></i> Избери ги сите'
+                        : '<i class="fas fa-times-circle"></i> Откажи ги сите';
+                });
+            }
+
+            // Update stats on checkbox change
+            const updateStats = () => {
+                const total = @Model.Students.Count();
+                const enrolled = document.querySelectorAll('#enroll-tab input[type="checkbox"]:checked').length;
+                const notEnrolled = total - enrolled;
+
+                // Update UI stats if needed
+                console.log(`Enrolled: ${enrolled}, Not Enrolled: ${notEnrolled}`);
+            };
+
+            document.querySelectorAll('#enroll-tab input[type="checkbox"]').forEach(cb => {
+                cb.addEventListener('change', updateStats);
+            });
+
+            // Form validation for deactivate form
+            const deactivateForm = document.querySelector('#deactivate-tab form[method="post"]');
+            if (deactivateForm) {
+                deactivateForm.addEventListener('submit', function(e) {
+                    const dateInput = this.querySelector('input[type="date"]');
+                    const checkboxes = this.querySelectorAll('input[name="SelectedEnrollmentIds"]:checked');
+
+                    if (checkboxes.length === 0) {
+                        e.preventDefault();
+                        alert('Ве молиме изберете барем еден студент за деактивирање.');
+                        return false;
+                    }
+
+                    if (!dateInput.value) {
+                        e.preventDefault();
+                        alert('Ве молиме внесете датум на деактивирање.');
+                        dateInput.focus();
+                        return false;
+                    }
+                });
+            }
+
+            // Add smooth animations
+            const animateElements = document.querySelectorAll('.table tbody tr, .stat-box, .filter-section');
+            animateElements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.05}s`;
+            });
+
+            // Auto-hide alert messages after 5 seconds
+            const alertMessages = document.querySelectorAll('.alert-message');
+            alertMessages.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-10px)';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
+        });
+    </script>
+}

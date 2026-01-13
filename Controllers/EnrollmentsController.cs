@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PhaseOne.Data;
 using PhaseOne.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Workshop1.Controllers
 {

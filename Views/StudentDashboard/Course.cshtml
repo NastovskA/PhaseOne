@@ -1,0 +1,79 @@
+﻿@model PhaseOne.ViewModels.StudentCourseEnrollmentsVm
+
+<h2>@Model.CourseTitle</h2>
+
+@if (TempData["Ok"] != null)
+{
+    <div class="alert alert-success">@TempData["Ok"]</div>
+}
+
+<form method="get" asp-action="Course">
+    <input type="hidden" name="id" value="@Model.CourseId" />
+    <label>Година:</label>
+    <select name="year" class="form-select d-inline-block" style="max-width:200px;">
+        @foreach (var y in Model.AvailableYears)
+        {
+            <option value="@y" selected="@(y == Model.SelectedYear)">@y</option>
+        }
+    </select>
+    <button class="btn btn-secondary ms-2" type="submit">Прикажи</button>
+</form>
+
+<hr />
+
+@if (!Model.Enrollments.Any())
+{
+    <div class="alert alert-info">Нема запишувања за оваа година.</div>
+}
+else
+{
+    <table class="table table-bordered table-sm align-middle">
+        <thead>
+            <tr>
+                <th>Семестар</th>
+                <th>Година</th>
+                <th>Seminar (file)</th>
+                <th>ProjectURL</th>
+                <th>Акција</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var e in Model.Enrollments)
+            {
+                <tr>
+                    <td>@(e.Semester ?? "")</td>
+                    <td>@e.Year</td>
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(e.SeminalUrl))
+                        {
+                            <a href="@e.SeminalUrl" target="_blank">преглед</a>
+                        }
+                        else
+                        {
+
+                            <span>-</span>
+                        }
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(e.ProjectUrl))
+                        {
+                            <a href="@e.ProjectUrl" target="_blank">GitHub</a>
+                        }
+                        else
+                        {
+
+                            <span>-</span>
+                        }
+                    </td>
+                    <td>
+                        <a class="btn btn-primary btn-sm"
+                           asp-action="EditLinks"
+                           asp-route-enrollmentId="@e.Id">
+                            Уреди линкови
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

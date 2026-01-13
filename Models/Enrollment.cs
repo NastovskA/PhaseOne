@@ -1,45 +1,44 @@
-﻿using PhaseOne.Models;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-public class Enrollment
+namespace PhaseOne.Models
 {
-    [Key]
-    public long Id { get; set; } 
+    [Index(nameof(CourseId), nameof(StudentId), nameof(Year), nameof(Semester), IsUnique = true)]
+    public class Enrollment
+    {
+        [Key]
+        public long Id { get; set; }
 
-    [Required]
-    public int CourseId { get; set; } 
-    
-    [Required]
-    public long StudentId { get; set; } 
-    
-    [StringLength(10)]
-    public string? Semester { get; set; } 
+        [Required]
+        public int CourseId { get; set; }
 
-    [Required]
-    public int? Year { get; set; } 
+        [Required]
+        public long StudentId { get; set; }
 
-    public int? Grade { get; set; } 
+        [Required]
+        [StringLength(10)]
+        public string Semester { get; set; } = "Winter"; // Winter / Summer
 
-    [StringLength(255)]
-    public string? SeminalUrl { get; set; } 
+        [Required]
+        public int Year { get; set; } // НЕ nullable
 
-    [StringLength(255)]
-    public string? ProjectUrl { get; set; } 
+        public int? Grade { get; set; }
 
-    public int? ExamPoints { get; set; } 
+        [StringLength(255)]
+        public string? SeminalUrl { get; set; }
 
-    public int? SeminalPoints { get; set; } 
+        [StringLength(255)]
+        public string? ProjectUrl { get; set; }
 
-    public int? ProjectPoints { get; set; } 
+        public int? ExamPoints { get; set; }
+        public int? SeminalPoints { get; set; }
+        public int? ProjectPoints { get; set; }
+        public int? AdditionalPoints { get; set; }
 
-    public int? AdditionalPoints { get; set; } 
+        [DataType(DataType.Date)]
+        public DateTime? FinishDate { get; set; }
 
-    [DataType(DataType.Date)]
-    public DateTime? FinishDate { get; set; }
-
-    public Course Course { get; set; } = null!;
-    public Student Student { get; set; } = null!;
-
-
+        public Course Course { get; set; } = null!;
+        public Student Student { get; set; } = null!;
+    }
 }

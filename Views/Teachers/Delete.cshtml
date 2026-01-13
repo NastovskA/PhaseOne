@@ -1,57 +1,193 @@
 ﻿@model Teacher
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Избриши наставник";
 }
 
-<h1>Delete</h1>
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Teacher</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FirstName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LastName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Degree)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Degree)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AcademicRank)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AcademicRank)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OfficeNumber)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OfficeNumber)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.HireDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.HireDate)
-        </dd>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+            padding: 15px;
+            max-width: 900px;
+            margin: auto;
+        }
+
+        h1 {
+            font-size: 22px;
+            color: #c0392b;
+            border-bottom: 2px solid #c0392b;
+            padding-bottom: 6px;
+            margin-bottom: 15px;
+        }
+
+        .warning-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        .teacher-summary {
+            background: #ffffff;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+        }
+
+            .teacher-summary strong {
+                font-size: 16px;
+                color: #2c3e50;
+            }
+
+            .teacher-summary div {
+                font-size: 13px;
+                color: #666;
+            }
+
+        h4 {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        dl {
+            background: white;
+            border-radius: 6px;
+            padding: 12px 15px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+        }
+
+        dt {
+            font-weight: 600;
+            font-size: 13px;
+            color: #555;
+            margin-top: 8px;
+        }
+
+        dd {
+            font-size: 13px;
+            margin-left: 0;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #eee;
+        }
+
+        form {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-danger {
+            background-color: #c0392b;
+            border: none;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+            .btn-danger:hover {
+                background-color: #a93226;
+            }
+
+        .back-link {
+            border: 1px solid #3498db;
+            color: #3498db;
+            padding: 8px 18px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            background: white;
+        }
+
+            .back-link:hover {
+                background-color: #3498db;
+                color: white;
+            }
+
+        @@media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            form {
+                flex-direction: column;
+            }
+
+            .btn-danger,
+            .back-link {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Избриши наставник</h1>
+
+    <div class="warning-box">
+        ⚠️ <strong>Внимание:</strong> Оваа акција е неповратна и податоците ќе бидат трајно избришани.
+    </div>
+
+    <div class="teacher-summary">
+        <strong>@Model.FirstName @Model.LastName</strong>
+        <div>@Model.AcademicRank, @Model.Degree</div>
+    </div>
+
+    <h4>Детали</h4>
+
+    <dl>
+        <dt>Име</dt>
+        <dd>@Model.FirstName</dd>
+
+        <dt>Презиме</dt>
+        <dd>@Model.LastName</dd>
+
+        <dt>Звање</dt>
+        <dd>@Model.AcademicRank</dd>
+
+        <dt>Образование</dt>
+        <dd>@Model.Degree</dd>
+
+        <dt>Кабинет</dt>
+        <dd>@Model.OfficeNumber</dd>
+
+        <dt>Датум на вработување</dt>
+        <dd>@Model.HireDate</dd>
     </dl>
-    
+
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+        <input type="submit" value="Избриши" class="btn-danger" />
+        <a asp-action="Index" class="back-link">Назад</a>
     </form>
-</div>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function (e) {
+            if (!confirm('Дали сте сигурни дека сакате трајно да го избришете овој наставник?')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+
+</body>
+</html>
